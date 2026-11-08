@@ -1,609 +1,959 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>민화 탐험대</title>
-  <style>
-    :root {
-      --ink: #342b27;
-      --paper: #fffaf0;
-      --coral: #e88968;
-      --green: #728a64;
-      --gold: #e2b655;
-      --shadow: 0 12px 32px #49372118;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조선 후기 민화 탐구 & 창작 스튜디오</title>
+    <style>
+        :root {
+            --primary: #7d1c1c;
+            --primary-dark: #581010;
+            --secondary: #d4a359;
+            --bg-paper: #f4efe6;
+            --panel-bg: #ffffff;
+            --text-dark: #2c221e;
+            --accent: #2e5a44;
+        }
 
-    * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
 
-    body {
-      margin: 0;
-      color: var(--ink);
-      background: #f5efe2;
-      font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    }
+        body {
+            background-color: var(--bg-paper);
+            color: var(--text-dark);
+            background-image: radial-gradient(#d3c6b4 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
+        header {
+            background-color: var(--primary);
+            color: #fff;
+            padding: 1.2rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border-bottom: 4px solid var(--secondary);
+            position: relative;
+        }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px max(20px, calc((100% - 1120px) / 2));
-      background: #fffaf0;
-      border-bottom: 1px solid #e9dfcb;
-    }
+        header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
 
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.25rem; }
-    .brand-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 14px; background: #f4d98f; }
-    .points { padding: 9px 14px; border-radius: 99px; background: #f7e7b8; font-weight: 800; white-space: nowrap; }
+        header p {
+            font-size: 0.95rem;
+            color: #f1d6b8;
+            margin-top: 5px;
+        }
 
-    main { max-width: 1120px; margin: auto; padding: 28px 20px 60px; }
-    .intro { margin-bottom: 22px; }
-    .intro h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.4rem); }
-    .intro p { margin: 0; color: #71665b; line-height: 1.65; }
+        .score-board {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--secondary);
+        }
 
-    .tabs { display: flex; gap: 8px; margin: 22px 0; }
-    .tab {
-      padding: 11px 18px; border: 0; border-radius: 12px;
-      color: #65584b; background: #eae2d4; font-weight: 800;
-    }
-    .tab.active { color: white; background: #586e51; }
+        nav {
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
 
-    .panel {
-      background: var(--paper); border: 1px solid #eee4d2;
-      border-radius: 22px; padding: 22px; box-shadow: var(--shadow);
-    }
+        .tab-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
 
-    .study-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr); gap: 22px; }
-    .art-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-    .art-heading h2 { margin: 0 0 5px; font-size: 1.35rem; }
-    .art-heading p { margin: 0; color: #756a5e; font-size: .92rem; }
-    .badge { padding: 6px 10px; border-radius: 99px; background: #f3e7c7; color: #6a5836; font-size: .82rem; font-weight: 800; white-space: nowrap; }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: #fcf9f5;
+        }
 
-    .artwork, .creator-board {
-      position: relative; overflow: hidden; min-height: 340px; border: 8px solid #d5b875;
-      border-radius: 15px; background: #f0dfb8;
-      box-shadow: inset 0 0 0 2px #fff9e9, 0 7px 15px #52391b20;
-    }
-    .artwork::before, .creator-board::before {
-      content: ""; position: absolute; inset: 12px; border: 1px solid #ffffff88;
-      border-radius: 8px; pointer-events: none;
-    }
-    .artwork .item, .creator-board .item {
-      position: absolute; z-index: 1; display: grid; place-items: center;
-      width: 72px; height: 72px; transform: translate(-50%, -50%);
-      border-radius: 50%; font-size: 48px; user-select: none;
-    }
-    .artwork .item { cursor: help; transition: transform .18s ease, filter .18s ease; }
-    .artwork .item:hover, .artwork .item:focus { transform: translate(-50%, -50%) scale(1.2); filter: drop-shadow(0 5px 5px #44321a55); outline: none; }
-    .artwork .item::after {
-      content: attr(data-label); position: absolute; top: 72px; left: 50%;
-      transform: translateX(-50%); padding: 4px 8px; border-radius: 99px;
-      background: #fffaf0e8; color: #514638; font-size: 12px; font-weight: 800;
-      white-space: nowrap; opacity: 0; transition: opacity .15s;
-    }
-    .artwork .item:hover::after, .artwork .item:focus::after { opacity: 1; }
-    .scene-sun { position: absolute; top: 8%; right: 12%; font-size: 46px; opacity: .8; pointer-events: none; }
-    .scene-hill { position: absolute; bottom: -34%; width: 70%; height: 65%; border-radius: 50%; background: #70876866; }
-    .scene-hill.one { left: -12%; }
-    .scene-hill.two { right: -15%; bottom: -42%; background: #b3835b55; }
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
 
-    .hover-hint { margin: 10px 0 0; color: #807567; font-size: .88rem; }
-    .meaning-box { min-height: 90px; margin-top: 12px; padding: 14px; border-radius: 14px; background: #f4edde; line-height: 1.6; }
-    .meaning-box strong { color: #526b4c; }
-    .side-card { padding: 18px; border-radius: 16px; background: #f7f1e5; }
-    .side-card + .side-card { margin-top: 14px; }
-    .side-card h3 { margin: 0 0 10px; font-size: 1.05rem; }
-    .side-card p { margin: 0; color: #6d6258; line-height: 1.6; }
-    .art-nav { display: flex; gap: 8px; margin-top: 16px; }
-    .art-nav button, .action {
-      border: 0; border-radius: 11px; padding: 10px 14px;
-      background: #e8dfd0; color: #4a4036; font-weight: 800;
-    }
-    .art-nav button:hover, .action:hover { filter: brightness(.97); }
-    .action.primary { color: white; background: #586e51; }
-    .action.coral { color: white; background: #d7785d; }
-    .art-nav .spacer { flex: 1; }
+        .tab-content {
+            display: none;
+        }
 
-    .quiz-options { display: grid; gap: 8px; margin-top: 12px; }
-    .quiz-option {
-      padding: 11px 12px; text-align: left; border: 2px solid #e8dfd0;
-      border-radius: 11px; background: #fffaf0; color: var(--ink); font-weight: 700;
-    }
-    .quiz-option:hover { border-color: #9baa8f; }
-    .quiz-option.correct { border-color: #66835e; background: #e9f1e4; }
-    .quiz-option.wrong { border-color: #d77b68; background: #fbe9e3; }
-    .quiz-result { min-height: 24px; margin-top: 10px; font-weight: 800; }
-    .small-note { margin-top: 8px !important; font-size: .82rem; }
+        .tab-content.active {
+            display: block;
+        }
 
-    .creator-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .8fr); gap: 22px; }
-    .creator-board {
-      min-height: 430px; background: #f0dfb8; touch-action: none;
-    }
-    .creator-board .item { cursor: grab; touch-action: none; }
-    .creator-board .item:active { cursor: grabbing; }
-    .creator-board .item.selected { outline: 3px dashed #d7785d; outline-offset: 3px; }
-    .creator-board .item .remove {
-      position: absolute; top: -4px; right: -5px; display: none; place-items: center;
-      width: 23px; height: 23px; padding: 0; border: 0; border-radius: 50%;
-      color: white; background: #bd5d4d; font-size: 14px;
-    }
-    .creator-board .item:hover .remove, .creator-board .item.selected .remove { display: grid; }
-    .controls { display: grid; gap: 15px; }
-    .control-group { padding: 16px; border-radius: 15px; background: #f7f1e5; }
-    .control-group h3 { margin: 0 0 10px; font-size: 1rem; }
-    .wish-row { display: flex; gap: 7px; }
-    .wish-row input { min-width: 0; flex: 1; padding: 10px; border: 1px solid #d8cbb7; border-radius: 10px; background: #fffaf0; }
-    .color-row, .mood-row, .object-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .swatch { width: 38px; height: 38px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 1px #cfc2ae; }
-    .swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px #586e51; }
-    .mood-button, .object-button { border: 1px solid #ddd0bc; border-radius: 10px; padding: 8px 10px; background: #fffaf0; }
-    .mood-button[aria-pressed="true"] { border-color: #586e51; background: #e7eddf; }
-    .object-button { font-size: 1.35rem; }
-    .object-button span { display: block; font-size: .75rem; font-weight: 700; }
-    .tool-row { display: flex; flex-wrap: wrap; gap: 8px; }
-    .creator-status { min-height: 22px; margin: 8px 0 0; color: #586e51; font-size: .9rem; font-weight: 700; }
-    .footer-note { margin: 16px 2px 0; color: #81776a; font-size: .84rem; line-height: 1.55; }
+        /* 1. 학습 & 퀴즈 탭 */
+        .study-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+        }
 
-    .hidden { display: none !important; }
+        .artwork-list {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2d8cd;
+        }
 
-    @media (max-width: 760px) {
-      .study-layout, .creator-grid { grid-template-columns: 1fr; }
-      .artwork { min-height: 310px; }
-      .creator-board { min-height: 360px; }
-      .panel { padding: 16px; }
-      .topbar { padding: 14px 18px; }
-    }
-  </style>
+        .artwork-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 0.8rem;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            background: #fdfbf7;
+        }
+
+        .artwork-card:hover, .artwork-card.active {
+            border-color: var(--primary);
+            background: #f9f2e8;
+        }
+
+        .artwork-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .artwork-card-info h3 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .artwork-card-info p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .viewer-container {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2d8cd;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-wrapper img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .hotspot {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background-color: rgba(212, 163, 89, 0.85);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            animation: pulse 1.8s infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(212, 163, 89, 0.7); }
+            70% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 0 10px rgba(212, 163, 89, 0); }
+            100% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(212, 163, 89, 0); }
+        }
+
+        .info-box {
+            background: #fdf8ef;
+            border-left: 5px solid var(--secondary);
+            padding: 1rem;
+            border-radius: 4px;
+            min-height: 70px;
+        }
+
+        .quiz-section {
+            background: #f5ece0;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px dashed var(--primary);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quiz-btn {
+            padding: 0.8rem;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .quiz-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* 2. 창작 스튜디오 탭 */
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+        }
+
+        .controls-panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2d8cd;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .wish-input-box {
+            display: flex;
+            gap: 5px;
+        }
+
+        .wish-input-box input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 0.6rem 1rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .sticker-palette {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 8px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .sticker-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-align: center;
+            transition: transform 0.1s;
+        }
+
+        .sticker-item:hover {
+            transform: scale(1.05);
+            border-color: var(--secondary);
+        }
+
+        .sticker-item canvas {
+            width: 45px;
+            height: 45px;
+        }
+
+        .canvas-area {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2d8cd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #mainCanvas {
+            border: 12px solid #583318;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            cursor: crosshair;
+            background-color: #f4efe6;
+        }
+
+        .canvas-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* 풋터 */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #777;
+            font-size: 0.85rem;
+            border-top: 1px solid #ddd;
+            margin-top: 2rem;
+            background: #fff;
+        }
+    </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><span class="brand-mark">🖼️</span> 민화 탐험대</div>
-    <div class="points" aria-live="polite">⭐ 내 점수 <span id="points">0</span>점</div>
-  </header>
 
-  <main>
-    <section class="intro">
-      <h1>그림 속 소망을 찾아볼까?</h1>
-      <p>민화 속 사물에는 옛사람들의 바람이 담겨 있어요. 그림을 살펴보고, 숨은 뜻을 맞혀 보세요!</p>
-    </section>
+    <header>
+        <h1>조선 후기 민화 탐구 & 창작 스튜디오</h1>
+        <p>민화 속 사물의 의미를 탐구하고, 나의 소망을 담은 소망 민화를 직접 작성해 보세요!</p>
+        <div class="score-board">
+            <span>🎁 복주머니 포인트:</span>
+            <span id="scoreText">0</span>점
+        </div>
+    </header>
 
-    <nav class="tabs" aria-label="학습 메뉴">
-      <button class="tab active" id="studyTab" type="button">🔎 민화 공부</button>
-      <button class="tab" id="createTab" type="button">🎨 나만의 민화</button>
+    <nav>
+        <button class="tab-btn active" onclick="switchTab('study')">1. 민화 탐구 & 퀴즈 게임</button>
+        <button class="tab-btn" onclick="switchTab('studio')">2. 나만의 소망 민화 만들기</button>
     </nav>
 
-    <section id="studyPanel" class="panel">
-      <div class="study-layout">
-        <div>
-          <div class="art-heading">
-            <div>
-              <h2 id="artTitle"></h2>
-              <p id="artSubtitle"></p>
+    <main>
+        <!-- TAB 1: 민화 탐구 -->
+        <div id="studyTab" class="tab-content active">
+            <div class="study-grid">
+                <div class="artwork-list" id="artworkList">
+                    <!-- Dynamic Rendering -->
+                </div>
+                <div class="viewer-container">
+                    <h2 id="artworkTitle">민화를 선택해주세요</h2>
+                    <div class="image-wrapper" id="imageWrapper">
+                        <img id="mainImage" src="" alt="민화 작품">
+                        <div id="hotspotContainer"></div>
+                    </div>
+                    <div class="info-box" id="infoBox">
+                        👉 <strong>민화 속 동그라미 번호</strong>를 클릭해 사물의 의미를 찾아보세요!
+                    </div>
+                    <div class="quiz-section">
+                        <h4 id="quizQuestion">❓ 이 민화 전체가 담고 있는 서민들의 소망은 무엇일까요?</h4>
+                        <div class="quiz-options" id="quizOptions">
+                            <!-- Dynamic Options -->
+                        </div>
+                    </div>
+                </div>
             </div>
-            <span class="badge" id="artGenre"></span>
-          </div>
-          <div class="artwork" id="artwork" aria-label="민화 그림">
-            <span class="scene-sun" aria-hidden="true">☀️</span>
-            <span class="scene-hill one" aria-hidden="true"></span>
-            <span class="scene-hill two" aria-hidden="true"></span>
-          </div>
-          <p class="hover-hint">💡 그림 속 사물에 마우스를 올리거나 눌러 뜻을 확인해 보세요.</p>
-          <div class="meaning-box" id="meaningBox" aria-live="polite">사물을 눌러 어떤 소망이 담겼는지 알아보세요.</div>
-          <div class="art-nav">
-            <button type="button" id="prevArt">← 이전 그림</button>
-            <span class="spacer"></span>
-            <span class="badge" id="artCount"></span>
-            <button type="button" id="nextArt">다음 그림 →</button>
-          </div>
         </div>
 
-        <aside>
-          <div class="side-card">
-            <h3>🧩 그림의 뜻을 맞혀 봐!</h3>
-            <p>사물의 뜻을 살펴본 뒤, 이 그림에 담긴 소망을 골라 보세요. 정답을 맞히면 10점을 얻어요!</p>
-            <div class="quiz-options" id="quizOptions"></div>
-            <div class="quiz-result" id="quizResult" aria-live="polite"></div>
-          </div>
-          <div class="side-card">
-            <h3>📚 민화 한 걸음</h3>
-            <p id="artFact"></p>
-            <p class="small-note">※ 민화의 상징은 그림과 시대에 따라 조금씩 달라질 수 있어요.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
+        <!-- TAB 2: 나만의 소망 민화 스튜디오 -->
+        <div id="studioTab" class="tab-content">
+            <div class="studio-grid">
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <label>1. 나의 소망 입력하기</label>
+                        <div class="wish-input-box">
+                            <input type="text" id="wishInput" placeholder="예: 시험 잘 보게 해주세요, 건강하기">
+                            <button class="btn" onclick="recommendObjects()">추천</button>
+                        </div>
+                    </div>
 
-    <section id="creatorPanel" class="panel hidden">
-      <div class="art-heading">
-        <div>
-          <h2>나의 소망을 그림으로!</h2>
-          <p>소망을 적고 사물을 골라 보세요. 그림 속 사물은 마우스나 손가락으로 옮길 수 있어요.</p>
-        </div>
-        <span class="badge">나만의 작품</span>
-      </div>
+                    <div class="control-group">
+                        <label>2. 민화 배경 색상선택</label>
+                        <select id="bgColorSelect" onchange="changeBgColor()" style="padding:0.5rem; border-radius:4px; border:1px solid #ccc;">
+                            <option value="#f4efe6">기본 한지 색상 (은은한 베이지)</option>
+                            <option value="#e8ded1">고풍스러운 고서화색</option>
+                            <option value="#e5eee6">청아한 오방색 청(靑) 느낌</option>
+                            <option value="#f9ebea">따뜻한 오방색 적(赤) 느낌</option>
+                        </select>
+                    </div>
 
-      <div class="creator-grid">
-        <div>
-          <div class="creator-board" id="creatorBoard" aria-label="나만의 민화 만들기 그림판">
-            <span class="scene-sun" aria-hidden="true">☀️</span>
-            <span class="scene-hill one" aria-hidden="true"></span>
-            <span class="scene-hill two" aria-hidden="true"></span>
-          </div>
-          <p class="footer-note">사물을 끌어서 원하는 곳에 놓아 보세요. 사물을 선택한 뒤 × 버튼을 누르면 지울 수 있어요.</p>
-        </div>
+                    <div class="control-group">
+                        <label>3. 사물 스티커 선택 (클릭 시 캔버스 배치)</label>
+                        <div class="sticker-palette" id="stickerPalette">
+                            <!-- Canvas Generated Icons -->
+                        </div>
+                    </div>
 
-        <div class="controls">
-          <div class="control-group">
-            <h3>1. 이루고 싶은 소망</h3>
-            <div class="wish-row">
-              <input id="wishInput" type="text" placeholder="예: 건강하고 행복하게 살고 싶어요" maxlength="80">
-              <button class="action primary" id="wishButton" type="button">사물 추천</button>
+                    <div class="control-group">
+                        <label>4. 족자 글귀 (소망 문구)</label>
+                        <input type="text" id="canvasText" placeholder="캔버스에 적을 글귀" style="padding:0.5rem; border-radius:4px; border:1px solid #ccc;">
+                        <button class="btn" onclick="addTextToCanvas()" style="margin-top:5px; background:var(--accent);">글귀 추가하기</button>
+                    </div>
+
+                    <div class="control-group">
+                        <button class="btn" onclick="clearCanvas()" style="background:#777;">캔버스 초기화</button>
+                    </div>
+                </div>
+
+                <div class="canvas-area">
+                    <canvas id="mainCanvas" width="600" height="700"></canvas>
+                    <div class="canvas-actions">
+                        <button class="btn" onclick="downloadCanvas()" style="font-size:1.1rem; padding:0.8rem 2rem; background:var(--primary);">📜 나만의 소망 민화 완성작 저장하기 (PNG)</button>
+                    </div>
+                </div>
             </div>
-            <p class="creator-status" id="wishStatus" aria-live="polite"></p>
-          </div>
-
-          <div class="control-group">
-            <h3>2. 배경 색 고르기</h3>
-            <div class="color-row" id="colorOptions" aria-label="배경 색 선택"></div>
-          </div>
-
-          <div class="control-group">
-            <h3>3. 분위기 고르기</h3>
-            <div class="mood-row" id="moodOptions"></div>
-          </div>
-
-          <div class="control-group">
-            <h3>4. 그림에 사물 더하기</h3>
-            <div class="object-row" id="objectOptions"></div>
-          </div>
-
-          <div class="control-group">
-            <h3>작품 도구</h3>
-            <div class="tool-row">
-              <button class="action coral" id="clearBoard" type="button">모두 지우기</button>
-              <button class="action" id="saveImage" type="button">그림 저장하기</button>
-            </div>
-            <p class="footer-note">그림 저장은 현재 그림판을 이미지로 내려받는 기능이에요.</p>
-          </div>
         </div>
-      </div>
-    </section>
-  </main>
+    </main>
 
-  <script>
-    const artworks = [
-      {
-        title: "책거리",
-        subtitle: "책과 여러 물건을 그린 그림",
-        genre: "책거리",
-        fact: "책거리는 책과 문방구, 여러 물건을 함께 그린 민화예요. 공부를 잘하고 지혜롭기를 바라는 마음이 담기곤 했어요.",
-        background: "linear-gradient(145deg, #e8d1a2, #f8edcf 55%, #c3a576)",
-        objects: [
-          { emoji: "📚", label: "책", x: 25, y: 58, meaning: "책은 배움과 지혜를 뜻해요. 공부를 잘하고 훌륭한 사람이 되기를 바라는 마음을 담았어요." },
-          { emoji: "🖌️", label: "붓", x: 48, y: 39, meaning: "붓은 글공부와 과거 시험을 떠올리게 해요. 학문에 힘쓰기를 바라는 뜻이 담겼어요." },
-          { emoji: "🏺", label: "도자기", x: 70, y: 61, meaning: "도자기와 귀한 물건은 풍요롭고 넉넉한 삶을 바라는 마음을 나타내기도 해요." },
-          { emoji: "🍑", label: "복숭아", x: 78, y: 31, meaning: "복숭아는 오래 살기를 바라는 마음을 나타내는 상징으로 쓰였어요." }
-        ],
-        answer: "공부를 잘하고 지혜롭고 넉넉하게 살기를 바라는 마음",
-        choices: ["공부를 잘하고 지혜롭고 넉넉하게 살기를 바라는 마음", "먼 바다로 여행을 떠나고 싶은 마음", "비가 많이 내려 농사가 망하기를 바라는 마음"]
-      },
-      {
-        title: "호작도",
-        subtitle: "호랑이와 까치가 등장하는 그림",
-        genre: "호작도",
-        fact: "호랑이와 까치가 함께 그려진 그림을 호작도라고 불러요. 호랑이는 익살스럽게 그려지는 경우가 많고, 까치는 반가운 소식을 전하는 새로 여겨졌어요.",
-        background: "linear-gradient(145deg, #d9e3bf, #f3e7bc 55%, #c8a47a)",
-        objects: [
-          { emoji: "🐯", label: "호랑이", x: 34, y: 60, meaning: "호랑이는 무서운 기운을 막아 준다고 여겨졌어요. 민화 속에서는 익살스럽고 친근하게 그려지기도 해요." },
-          { emoji: "🐦", label: "까치", x: 69, y: 33, meaning: "까치는 반가운 소식을 전하는 새로 여겨졌어요. 좋은 소식이 오기를 바라는 마음을 담았어요." },
-          { emoji: "🌲", label: "소나무", x: 75, y: 65, meaning: "소나무는 겨울에도 푸른 모습을 잃지 않아 오래 사는 것과 굳센 마음을 상징하기도 해요." },
-          { emoji: "🌸", label: "꽃", x: 22, y: 31, meaning: "꽃은 아름다움과 기쁜 일을 나타내곤 해요. 그림을 화사하게 꾸며 주기도 해요." }
-        ],
-        answer: "나쁜 기운을 막고 반가운 소식을 기다리는 마음",
-        choices: ["나쁜 기운을 막고 반가운 소식을 기다리는 마음", "책을 모두 불태우고 싶은 마음", "바닷속 물고기와 살고 싶은 마음"]
-      },
-      {
-        title: "십장생도",
-        subtitle: "오래 살기를 바라는 열 가지 상징",
-        genre: "십장생도",
-        fact: "십장생도에는 해, 산, 물, 돌, 소나무, 구름, 학, 사슴, 거북, 불로초 등 오래 사는 것과 관련된 상징이 등장해요. 그림마다 구성은 조금씩 다를 수 있어요.",
-        background: "linear-gradient(145deg, #b9d8d1, #e9e9c5 56%, #8eaf91)",
-        objects: [
-          { emoji: "☀️", label: "해", x: 74, y: 25, meaning: "해는 밝음과 생명력을 나타내요. 오래도록 세상을 비추는 모습으로 장수의 상징이 되기도 해요." },
-          { emoji: "🏔️", label: "산", x: 25, y: 65, meaning: "산은 오래도록 그 자리에 있는 굳센 자연을 나타내요. 오래 살기를 바라는 뜻으로 그려지기도 해요." },
-          { emoji: "🐢", label: "거북", x: 52, y: 73, meaning: "거북은 오래 사는 동물로 알려져 장수를 상징해요." },
-          { emoji: "🦌", label: "사슴", x: 69, y: 60, meaning: "사슴은 장수와 복을 상징하기도 해요. 그림에 따라 좋은 기운을 전하는 존재로 그려져요." },
-          { emoji: "🌲", label: "소나무", x: 28, y: 32, meaning: "소나무는 사계절 내내 푸르러 변치 않는 생명력과 장수를 상징해요." }
-        ],
-        answer: "오래오래 건강하게 살기를 바라는 마음",
-        choices: ["오래오래 건강하게 살기를 바라는 마음", "빨리 겨울이 오기를 바라는 마음", "집을 떠나 길을 잃고 싶은 마음"]
-      },
-      {
-        title: "화조도",
-        subtitle: "꽃과 새를 함께 그린 그림",
-        genre: "화조도",
-        fact: "화조도는 꽃과 새를 그린 민화예요. 꽃의 아름다움과 새의 생동감이 어우러져 화목하고 기쁜 삶을 바라는 뜻을 담기도 했어요.",
-        background: "linear-gradient(145deg, #f0d7b6, #f8edda 55%, #d7b7a0)",
-        objects: [
-          { emoji: "🌺", label: "꽃", x: 30, y: 49, meaning: "꽃은 아름다움과 생명력을 나타내요. 모란처럼 풍성한 꽃은 부귀와 복을 상징하기도 해요." },
-          { emoji: "🐦", label: "새", x: 65, y: 35, meaning: "새는 좋은 소식이나 기쁜 일을 나타내기도 해요. 짝을 지은 새는 화목한 사이를 뜻할 수 있어요." },
-          { emoji: "🦋", label: "나비", x: 72, y: 65, meaning: "나비는 아름다움과 즐거움을 나타내요. 꽃과 함께 그려져 생기 있는 봄 풍경을 만들어요." },
-          { emoji: "🌿", label: "풀과 잎", x: 40, y: 73, meaning: "푸른 잎은 자라나는 생명과 싱그러운 기운을 나타내요." }
-        ],
-        answer: "아름다운 자연 속에서 기쁘고 화목하게 살기를 바라는 마음",
-        choices: ["아름다운 자연 속에서 기쁘고 화목하게 살기를 바라는 마음", "모든 꽃과 새가 사라지기를 바라는 마음", "시험을 보지 않고 도망가고 싶은 마음"]
-      }
-    ];
+    <footer>
+        <p>초등학교 5학년 사회과 조선 후기 서민 문화 - 민화 학습 도구 | 문화재청 및 국립중앙박물관 공공 누리/위키미디어 공공 데이터 활용</p>
+    </footer>
 
-    const pointDisplay = document.getElementById("points");
-    let points = Number(localStorage.getItem("minhwaPoints") || 0);
-    let currentArt = 0;
-    let answered = new Set();
+    <script>
+        // 조선후기 실제 민화 이미지 (Wikimedia / 공공누리 공공저작물)
+        const artworks = [
+            {
+                id: 'hojakdo',
+                title: '호작도 (호랑이와 까치)',
+                period: '조선 후기 (19세기)',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Minhwa-Hojakdo-01.jpg/600px-Minhwa-Hojakdo-01.jpg',
+                description: '조선 후기 서민들이 새해를 맞아 액운을 막고 기쁜 소식을 기원하며 대문에 붙이던 대표적인 민화입니다.',
+                hotspots: [
+                    { x: 50, y: 55, num: 1, name: '호랑이', meaning: '액운과 나쁜 기운을 물리쳐주는 영험한 영물(신령스러운 동물)을 상징합니다.' },
+                    { x: 35, y: 18, num: 2, name: '까치', meaning: '기쁜 소식과 좋은 일(길조)을 전해주는 전령을 상징합니다.' },
+                    { x: 75, y: 25, num: 3, name: '소나무', meaning: '새해의 시작과 장수, 변함없는 지조와 절개를 상징합니다.' }
+                ],
+                quiz: {
+                    question: '이 호작도 그림이 담고 있는 조선 시대 서민들의 주요 소망은 무엇일까요?',
+                    options: [
+                        { text: '나쁜 액운을 막고 기쁜 소식이 찾아오길 바라는 소망', correct: true },
+                        { text: '벼슬자리에 올라 부귀영화와 권력을 누리려는 소망', correct: false },
+                        { text: '학문에 매진하여 훌륭한 학자가 되려는 소망', correct: false },
+                        { text: '자식을 많이 낳아 가문을 번창시키려는 소망', correct: false }
+                    ]
+                }
+            },
+            {
+                id: 'chaekgeori',
+                title: '책거리 (책가도)',
+                period: '조선 후기 (18~19세기)',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Chaekgeori-19th_century.jpg/600px-Chaekgeori-19th_century.jpg',
+                description: '책과 여러 가지 문방구, 선비의 물품들을 그린 그림으로 학문 사랑과 출세를 기원했습니다.',
+                hotspots: [
+                    { x: 48, y: 35, num: 1, name: '쌓인 책들', meaning: '학문에 힘써 깊은 지식을 쌓고 학업을 성취하길 바라는 소망입니다.' },
+                    { x: 28, y: 65, num: 2, name: '붓과 먹', meaning: '벼슬길에 올라 출세하고 나라에 이바지하려는 선비의 덕목을 뜻합니다.' },
+                    { x: 70, y: 60, num: 3, name: '도자기와 복숭아', meaning: '평안함(도자기)과 장수(복숭아)를 기원하는 고풍스러운 장식물입니다.' }
+                ],
+                quiz: {
+                    question: '책거리(책가도)를 방에 걸어두며 서민과 선비들이 빌었던 염원은 무엇일까요?',
+                    options: [
+                        { text: '부지런히 학문을 탐구하여 출세하고 지혜로워지기를 기원함', correct: true },
+                        { text: '외적의 침입으로부터 나라를 보호하기를 기원함', correct: false },
+                        { text: '농사가 풍년이 들기를 기원함', correct: false },
+                        { text: '바다로 나간 배가 안전하게 돌아오기를 기원함', correct: false }
+                    ]
+                }
+            },
+            {
+                id: 'munjado',
+                title: '문자도 (효·제·충·신...)',
+                period: '조선 후기 (19세기)',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Munjado-Hyo.jpg/500px-Munjado-Hyo.jpg',
+                description: '유교의 핵심 덕목인 글자(효, 제, 충, 신 등)에 상징적인 고사 속 상징물을 함께 넣어 장식한 민화입니다.',
+                hotspots: [
+                    { x: 50, y: 40, num: 1, name: '효(孝) 자 모양', meaning: '부모님께 효도하고 가족 간에 사랑하며 우애 있게 지내야 한다는 유교적 가치관입니다.' },
+                    { x: 30, y: 70, num: 2, name: '잉어', meaning: '병석의 부모님을 위해 추운 겨울 얼음을 깨고 잉어를 구한 효자 고사에서 나온 상징입니다.' },
+                    { x: 75, y: 25, num: 3, name: '거문고', meaning: '부모님의 마음을 기쁘게 해드리고 마음의 평화를 찾는 상징물입니다.' }
+                ],
+                quiz: {
+                    question: '문자도를 통해 조선 서민들이 아이들에게 가르치고자 했던 바는 무엇일까요?',
+                    options: [
+                        { text: '효도, 우애, 충성 등 사람이 지켜야 할 바른 도리와 덕목', correct: true },
+                        { text: '장사를 잘 하여 돈을 많이 버는 방법', correct: false },
+                        { text: '무술을 연마하여 싸움에서 이기는 기술', correct: false },
+                        { text: '외국어 표현을 빠르게 익히는 요령', correct: false }
+                    ]
+                }
+            },
+            {
+                id: 'hwajodo',
+                title: '화조도 (꽃과 새)',
+                period: '조선 후기 (19세기)',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Korean_Minhwa-Hwajodo.jpg/500px-Korean_Minhwa-Hwajodo.jpg',
+                description: '아름다운 꽃과 한 쌍의 새를 그려 가정의 화목과 다정함, 화창한 봄날 같은 행복을 기원했습니다.',
+                hotspots: [
+                    { x: 45, y: 35, num: 1, name: '한 쌍의 새', meaning: '부부 간의 사랑과 가족 모두가 서로 화목하게 지내는 것을 상징합니다.' },
+                    { x: 60, y: 65, num: 2, name: '모란꽃', meaning: '꽃 중의 왕으로 불리며, 부귀영화와 화창한 삶을 상징합니다.' },
+                    { x: 25, y: 75, num: 3, name: '바위', meaning: '오랜 세월 변함없는 건강과 영원한 장수를 상징합니다.' }
+                ],
+                quiz: {
+                    question: '화조도(꽃과 새 그림)를 가정에 걸어둠으로써 기대했던 바는 무엇일까요?',
+                    options: [
+                        { text: '가정이 화목하고 부귀와 행복이 가득하기를 기원함', correct: true },
+                        { text: '귀신을 물리치고 엄격한 질서를 세우기를 기원함', correct: false },
+                        { text: '비가 많이 내려 가뭄을 해결하기를 기원함', correct: false },
+                        { text: '어려운 시험에 일등으로 합격하기만을 기원함', correct: false }
+                    ]
+                }
+            }
+        ];
 
-    function updatePoints() {
-      pointDisplay.textContent = points;
-      localStorage.setItem("minhwaPoints", String(points));
-    }
+        // 스티커 그래픽 생성용 정의
+        const stickerDefs = [
+            { id: 'tiger', name: '호랑이', type: 'drawTiger', meaning: '액운 퇴치, 늠름함' },
+            { id: 'magpie', name: '까치', type: 'drawMagpie', meaning: '기쁜 소식' },
+            { id: 'pine', name: '소나무', type: 'drawPine', meaning: '장수, 절개' },
+            { id: 'book', name: '책 stack', type: 'drawBook', meaning: '지혜, 학업 성취' },
+            { id: 'peony', name: '모란꽃', type: 'drawPeony', meaning: '부귀, 행복' },
+            { id: 'carp', name: '잉어', type: 'drawCarp', meaning: '효도, 등용문' },
+            { id: 'sun', name: '해', type: 'drawSun', meaning: '새 출발, 밝은 미래' },
+            { id: 'peach', name: '복숭아', type: 'drawPeach', meaning: '무병장수' }
+        ];
 
-    function showArtwork(index) {
-      currentArt = (index + artworks.length) % artworks.length;
-      const art = artworks[currentArt];
-      const board = document.getElementById("artwork");
-      board.querySelectorAll(".item").forEach(item => item.remove());
-      board.style.background = art.background;
-      document.getElementById("artTitle").textContent = art.title;
-      document.getElementById("artSubtitle").textContent = art.subtitle;
-      document.getElementById("artGenre").textContent = art.genre;
-      document.getElementById("artFact").textContent = art.fact;
-      document.getElementById("artCount").textContent = `${currentArt + 1} / ${artworks.length}`;
-      document.getElementById("meaningBox").textContent = "사물을 눌러 어떤 소망이 담겼는지 알아보세요.";
-      document.getElementById("quizResult").textContent = "";
-      art.objects.forEach(obj => {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.className = "item";
-        item.style.left = obj.x + "%";
-        item.style.top = obj.y + "%";
-        item.textContent = obj.emoji;
-        item.setAttribute("aria-label", `${obj.label}의 뜻 보기`);
-        item.dataset.label = obj.label;
-        item.addEventListener("click", () => {
-          document.getElementById("meaningBox").innerHTML =
-            `<strong>${obj.label}의 뜻</strong><br>${obj.meaning}`;
-        });
-        board.appendChild(item);
-      });
+        let currentArtworkIndex = 0;
+        let score = 0;
+        let canvasElements = [];
+        let canvasBgColor = '#f4efe6';
 
-      const options = document.getElementById("quizOptions");
-      options.innerHTML = "";
-      art.choices.forEach(choice => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "quiz-option";
-        button.textContent = choice;
-        button.addEventListener("click", () => checkAnswer(button, choice, art.answer));
-        options.appendChild(button);
-      });
+        // 탭 전환
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-      if (answered.has(currentArt)) {
-        document.getElementById("quizResult").textContent = "이 그림의 퀴즈는 이미 풀었어요. 다음 그림도 도전해 보세요!";
-        options.querySelectorAll("button").forEach(button => {
-          button.disabled = true;
-          if (button.textContent === art.answer) button.classList.add("correct");
-        });
-      }
-    }
-
-    function checkAnswer(button, choice, answer) {
-      const result = document.getElementById("quizResult");
-      const buttons = [...document.querySelectorAll(".quiz-option")];
-      if (choice === answer) {
-        button.classList.add("correct");
-        if (!answered.has(currentArt)) {
-          points += 10;
-          updatePoints();
-          answered.add(currentArt);
-          result.textContent = "정답이에요! ⭐ 10점을 얻었어요!";
-        } else {
-          result.textContent = "정답이에요! 이 그림의 점수는 이미 받았어요.";
+            if (tabName === 'study') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('studyTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('studioTab').classList.add('active');
+                renderCanvas();
+            }
         }
-        buttons.forEach(option => option.disabled = true);
-      } else {
-        button.classList.add("wrong");
-        result.textContent = "아쉬워요! 사물의 뜻을 다시 살펴보고 생각해 보세요.";
-      }
-    }
 
-    document.getElementById("prevArt").addEventListener("click", () => showArtwork(currentArt - 1));
-    document.getElementById("nextArt").addEventListener("click", () => showArtwork(currentArt + 1));
+        // 민화 학습 탭 초기화
+        function initStudyTab() {
+            const listEl = document.getElementById('artworkList');
+            listEl.innerHTML = '';
 
-    const studyTab = document.getElementById("studyTab");
-    const createTab = document.getElementById("createTab");
-    studyTab.addEventListener("click", () => {
-      studyTab.classList.add("active");
-      createTab.classList.remove("active");
-      document.getElementById("studyPanel").classList.remove("hidden");
-      document.getElementById("creatorPanel").classList.add("hidden");
-    });
-    createTab.addEventListener("click", () => {
-      createTab.classList.add("active");
-      studyTab.classList.remove("active");
-      document.getElementById("creatorPanel").classList.remove("hidden");
-      document.getElementById("studyPanel").classList.add("hidden");
-    });
+            artworks.forEach((art, idx) => {
+                const card = document.createElement('div');
+                card.className = `artwork-card ${idx === 0 ? 'active' : ''}`;
+                card.onclick = () => selectArtwork(idx);
+                card.innerHTML = `
+                    <img src="${art.image}" alt="${art.title}">
+                    <div class="artwork-card-info">
+                        <h3>${art.title}</h3>
+                        <p>${art.period}</p>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
 
-    const symbolLibrary = [
-      { emoji: "🌸", label: "꽃", keys: ["행복", "아름", "기쁨", "봄", "친구", "가족"] },
-      { emoji: "📚", label: "책", keys: ["공부", "지혜", "시험", "배움", "꿈", "선생"] },
-      { emoji: "🐢", label: "거북", keys: ["건강", "오래", "장수", "튼튼"] },
-      { emoji: "🐦", label: "새", keys: ["소식", "친구", "여행", "자유", "행복"] },
-      { emoji: "🐯", label: "호랑이", keys: ["용기", "무서", "보호", "안전"] },
-      { emoji: "🍑", label: "복숭아", keys: ["건강", "오래", "장수"] },
-      { emoji: "🌲", label: "소나무", keys: ["건강", "오래", "장수", "굳센"] },
-      { emoji: "🦋", label: "나비", keys: ["행복", "아름", "기쁨", "봄"] },
-      { emoji: "💰", label: "복주머니", keys: ["돈", "부자", "풍요", "복", "넉넉"] },
-      { emoji: "🏺", label: "도자기", keys: ["풍요", "넉넉", "부자"] },
-      { emoji: "☀️", label: "해", keys: ["밝", "희망", "건강", "새로운"] },
-      { emoji: "🌙", label: "달", keys: ["평화", "밤", "소원"] },
-      { emoji: "🌈", label: "무지개", keys: ["행복", "희망", "기쁨"] },
-      { emoji: "🐟", label: "물고기", keys: ["풍요", "복", "넉넉"] },
-      { emoji: "🖌️", label: "붓", keys: ["공부", "지혜", "배움", "꿈"] }
-    ];
+            selectArtwork(0);
+        }
 
-    const board = document.getElementById("creatorBoard");
-    const objectOptions = document.getElementById("objectOptions");
-    const wishStatus = document.getElementById("wishStatus");
-    let itemCounter = 0;
+        function selectArtwork(index) {
+            currentArtworkIndex = index;
+            const art = artworks[index];
 
-    function addCreatorItem(symbol, x, y) {
-      const item = document.createElement("div");
-      item.className = "item";
-      item.textContent = symbol.emoji;
-      item.title = symbol.label + " — 끌어서 옮기기";
-      item.setAttribute("aria-label", symbol.label + ", 끌어서 옮기기");
-      item.style.left = (x ?? 50) + "%";
-      item.style.top = (y ?? 50) + "%";
-      item.dataset.id = String(++itemCounter);
+            document.querySelectorAll('.artwork-card').forEach((card, idx) => {
+                card.classList.toggle('active', idx === index);
+            });
 
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "remove";
-      remove.textContent = "×";
-      remove.setAttribute("aria-label", symbol.label + " 지우기");
-      remove.addEventListener("pointerdown", event => event.stopPropagation());
-      remove.addEventListener("click", event => {
-        event.stopPropagation();
-        item.remove();
-      });
-      item.appendChild(remove);
+            document.getElementById('artworkTitle').innerText = `${art.title} (${art.period})`;
+            document.getElementById('mainImage').src = art.image;
+            document.getElementById('infoBox').innerHTML = `👉 <strong>${art.title}</strong>: ${art.description}<br><span style="color:#888;">(그림 위 동그라미 번호를 눌러 사물의 의미를 확인하세요)</span>`;
 
-      item.addEventListener("pointerdown", event => {
-        if (event.target === remove) return;
-        event.preventDefault();
-        item.classList.add("selected");
-        item.setPointerCapture(event.pointerId);
-        const rect = board.getBoundingClientRect();
-        const move = moveEvent => {
-          const left = Math.max(4, Math.min(96, ((moveEvent.clientX - rect.left) / rect.width) * 100));
-          const top = Math.max(6, Math.min(94, ((moveEvent.clientY - rect.top) / rect.height) * 100));
-          item.style.left = left + "%";
-          item.style.top = top + "%";
+            // Hotspots render
+            const container = document.getElementById('hotspotContainer');
+            container.innerHTML = '';
+            art.hotspots.forEach(hs => {
+                const spot = document.createElement('div');
+                spot.className = 'hotspot';
+                spot.style.left = hs.x + '%';
+                spot.style.top = hs.y + '%';
+                spot.innerText = hs.num;
+                spot.onclick = () => {
+                    document.getElementById('infoBox').innerHTML = `
+                        <h4 style="color:var(--primary); margin-bottom:4px;">🔍 ${hs.num}번. ${hs.name}</h4>
+                        <p style="font-size:0.95rem;">${hs.meaning}</p>
+                    `;
+                };
+                container.appendChild(spot);
+            });
+
+            // Quiz render
+            document.getElementById('quizQuestion').innerText = `❓ ${art.quiz.question}`;
+            const quizOpts = document.getElementById('quizOptions');
+            quizOpts.innerHTML = '';
+            art.quiz.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkQuiz(opt.correct);
+                quizOpts.appendChild(btn);
+            });
+        }
+
+        function checkQuiz(isCorrect) {
+            if (isCorrect) {
+                score += 50;
+                document.getElementById('scoreText').innerText = score;
+                alert('🎉 정답입니다! 조선 시대 서민들의 마음을 잘 이해하셨네요! (+50점 획득)');
+            } else {
+                alert('💡 다시 한번 생각해보세요! 사물들의 의미(호랑이, 까치, 책 등)를 살펴보면 힌트를 얻을 수 있습니다.');
+            }
+        }
+
+        // Canvas & Studio 관련
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function initStudioTab() {
+            renderStickerPalette();
+            renderCanvas();
+        }
+
+        // 개별 사물 아이콘 그리기 함수들 (Canvas Vector Data)
+        function drawIcon(type, targetCtx, w, h) {
+            targetCtx.clearRect(0, 0, w, h);
+            targetCtx.save();
+
+            if(type === 'drawTiger') {
+                // 호랑이 얼굴
+                targetCtx.fillStyle = '#e69500';
+                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 18, 0, Math.PI*2); targetCtx.fill();
+                // 귀
+                targetCtx.beginPath(); targetCtx.arc(w/2-14, h/2-14, 6, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2+14, h/2-14, 6, 0, Math.PI*2); targetCtx.fill();
+                // 줄무늬
+                targetCtx.strokeStyle = '#000'; targetCtx.lineWidth = 2;
+                targetCtx.beginPath(); targetCtx.moveTo(w/2-8, h/2-10); targetCtx.lineTo(w/2+8, h/2-10); targetCtx.stroke();
+                targetCtx.beginPath(); targetCtx.moveTo(w/2-12, h/2); targetCtx.lineTo(w/2-4, h/2); targetCtx.stroke();
+                targetCtx.beginPath(); targetCtx.moveTo(w/2+4, h/2); targetCtx.lineTo(w/2+12, h/2); targetCtx.stroke();
+                // 눈
+                targetCtx.fillStyle = '#fff';
+                targetCtx.beginPath(); targetCtx.arc(w/2-6, h/2-4, 4, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2+6, h/2-4, 4, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.fillStyle = '#000';
+                targetCtx.beginPath(); targetCtx.arc(w/2-6, h/2-4, 2, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2+6, h/2-4, 2, 0, Math.PI*2); targetCtx.fill();
+            } else if(type === 'drawMagpie') {
+                // 까치
+                targetCtx.fillStyle = '#222';
+                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2+2, 16, 10, Math.PI/4, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.fillStyle = '#fff';
+                targetCtx.beginPath(); targetCtx.arc(w/2-4, h/2, 6, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.fillStyle = '#d4a359';
+                targetCtx.beginPath(); targetCtx.moveTo(w/2-14, h/2-2); targetCtx.lineTo(w/2-22, h/2); targetCtx.lineTo(w/2-14, h/2+4); targetCtx.fill();
+            } else if(type === 'drawPine') {
+                // 소나무
+                targetCtx.fillStyle = '#5c4033';
+                targetCtx.fillRect(w/2-3, h/2, 6, 18);
+                targetCtx.fillStyle = '#2e5a44';
+                targetCtx.beginPath(); targetCtx.arc(w/2, h/2-6, 16, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2-10, h/2+2, 12, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2+10, h/2+2, 12, 0, Math.PI*2); targetCtx.fill();
+            } else if(type === 'drawBook') {
+                // 책
+                targetCtx.fillStyle = '#1f4e79';
+                targetCtx.fillRect(w/2-16, h/2-12, 32, 22);
+                targetCtx.fillStyle = '#fff';
+                targetCtx.fillRect(w/2-14, h/2-10, 28, 18);
+                targetCtx.fillStyle = '#b83b5e';
+                targetCtx.fillRect(w/2-12, h/2-8, 24, 14);
+            } else if(type === 'drawPeony') {
+                // 모란꽃
+                targetCtx.fillStyle = '#c0392b';
+                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 15, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.fillStyle = '#e74c3c';
+                for(let i=0; i<5; i++) {
+                    let ang = (i*72) * Math.PI/180;
+                    targetCtx.beginPath(); targetCtx.arc(w/2 + Math.cos(ang)*8, h/2 + Math.sin(ang)*8, 8, 0, Math.PI*2); targetCtx.fill();
+                }
+                targetCtx.fillStyle = '#f1c40f';
+                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 5, 0, Math.PI*2); targetCtx.fill();
+            } else if(type === 'drawCarp') {
+                // 잉어
+                targetCtx.fillStyle = '#d35400';
+                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2, 18, 10, 0, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.moveTo(w/2+14, h/2); targetCtx.lineTo(w/2+24, h/2-8); targetCtx.lineTo(w/2+24, h/2+8); targetCtx.fill();
+            } else if(type === 'drawSun') {
+                // 해
+                targetCtx.fillStyle = '#c0392b';
+                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 16, 0, Math.PI*2); targetCtx.fill();
+            } else if(type === 'drawPeach') {
+                // 복숭아
+                targetCtx.fillStyle = '#ff7675';
+                targetCtx.beginPath(); targetCtx.arc(w/2-5, h/2, 12, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(w/2+5, h/2, 12, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.moveTo(w/2, h/2-16); targetCtx.lineTo(w/2-10, h/2+8); targetCtx.lineTo(w/2+10, h/2+8); targetCtx.fill();
+                targetCtx.fillStyle = '#27ae60';
+                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2-14, 8, 3, Math.PI/4, 0, Math.PI*2); targetCtx.fill();
+            }
+
+            targetCtx.restore();
+        }
+
+        function renderStickerPalette() {
+            const palette = document.getElementById('stickerPalette');
+            palette.innerHTML = '';
+
+            stickerDefs.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'sticker-item';
+                item.onclick = () => addStickerToCanvas(s.type, s.name);
+
+                const c = document.createElement('canvas');
+                c.width = 50; c.height = 50;
+                const cCtx = c.getContext('2d');
+                drawIcon(s.type, cCtx, 50, 50);
+
+                item.appendChild(c);
+                const span = document.createElement('span');
+                span.innerText = `${s.name}
+(${s.meaning})`;
+                item.appendChild(span);
+
+                palette.appendChild(item);
+            });
+        }
+
+        function changeBgColor() {
+            canvasBgColor = document.getElementById('bgColorSelect').value;
+            renderCanvas();
+        }
+
+        function addStickerToCanvas(type, name) {
+            canvasElements.push({
+                kind: 'sticker',
+                type: type,
+                name: name,
+                x: 300 + (Math.random()*40 - 20),
+                y: 350 + (Math.random()*40 - 20),
+                size: 80
+            });
+            renderCanvas();
+        }
+
+        function addTextToCanvas() {
+            const val = document.getElementById('canvasText').value;
+            if(!val.trim()) return;
+            canvasElements.push({
+                kind: 'text',
+                text: val,
+                x: 300,
+                y: 120,
+                fontSize: 26
+            });
+            renderCanvas();
+        }
+
+        function recommendObjects() {
+            const wish = document.getElementById('wishInput').value;
+            if(!wish) {
+                alert('소망을 입력해 보세요!');
+                return;
+            }
+
+            let rec = [];
+            if(wish.includes('시험') || wish.includes('공부') || wish.includes('성적') || wish.includes('책')) {
+                rec = ['drawBook', 'drawCarp'];
+                alert('💡 [학업 성취 & 출세] 소망에 어울리는 "책"과 "잉어"를 추천합니다!');
+            } else if(wish.includes('건강') || wish.includes(' 오래') || wish.includes('아프지')) {
+                rec = ['drawPine', 'drawPeach'];
+                alert('💡 [장수 & 무병장수] 소망에 어울리는 "소망 소나무"와 "복숭아"를 추천합니다!');
+            } else if(wish.includes('행복') || wish.includes('친구') || wish.includes('가족') || wish.includes('화목')) {
+                rec = ['drawMagpie', 'drawPeony'];
+                alert('💡 [기쁨 & 화목] 소망에 어울리는 "까치"와 "모란꽃"을 추천합니다!');
+            } else {
+                rec = ['drawTiger', 'drawSun'];
+                alert('💡 [액운 퇴치 & 밝은 미래] 소망에 어울리는 "호랑이"와 "해"를 추천합니다!');
+            }
+
+            rec.forEach(rType => {
+                const def = stickerDefs.find(s => s.type === rType);
+                addStickerToCanvas(rType, def ? def.name : '사물');
+            });
+        }
+
+        function clearCanvas() {
+            canvasElements = [];
+            renderCanvas();
+        }
+
+        function renderCanvas() {
+            // 배경
+            ctx.fillStyle = canvasBgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 전통 족자 문양 틀
+            ctx.strokeStyle = '#7d1c1c';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(15, 15, canvas.width-30, canvas.height-30);
+            ctx.strokeStyle = '#d4a359';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(22, 22, canvas.width-44, canvas.height-44);
+
+            // 요소들 그리기
+            canvasElements.forEach(el => {
+                if(el.kind === 'sticker') {
+                    ctx.save();
+                    ctx.translate(el.x, el.y);
+                    drawIcon(el.type, ctx, el.size, el.size);
+                    ctx.restore();
+                } else if(el.kind === 'text') {
+                    ctx.save();
+                    ctx.font = 'bold ' + el.fontSize + 'px "궁서", "Gungsuh", serif';
+                    ctx.fillStyle = '#7d1c1c';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(el.text, el.x, el.y);
+
+                    // 낙관 도장 느낌 효과
+                    ctx.fillStyle = '#c0392b';
+                    ctx.fillRect(el.x + (el.text.length*10) + 10, el.y - 20, 22, 22);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText('인', el.x + (el.text.length*10) + 21, el.y - 5);
+                    ctx.restore();
+                }
+            });
+        }
+
+        // 캔버스 드래그 이동
+        let isDragging = false;
+        let selectedEl = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // 역순 검사 (위에 그려진 것 우선)
+            for(let i = canvasElements.length - 1; i >= 0; i--) {
+                const el = canvasElements[i];
+                if(el.kind === 'sticker') {
+                    if(mouseX >= el.x && mouseX <= el.x + el.size && mouseY >= el.y && mouseY <= el.y + el.size) {
+                        isDragging = true;
+                        selectedEl = el;
+                        dragOffsetX = mouseX - el.x;
+                        dragOffsetY = mouseY - el.y;
+                        return;
+                    }
+                } else if(el.kind === 'text') {
+                    if(Math.abs(mouseX - el.x) < 100 && Math.abs(mouseY - el.y) < 20) {
+                        isDragging = true;
+                        selectedEl = el;
+                        dragOffsetX = mouseX - el.x;
+                        dragOffsetY = mouseY - el.y;
+                        return;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if(!isDragging || !selectedEl) return;
+            const rect = canvas.getBoundingClientRect();
+            selectedEl.x = (e.clientX - rect.left) - dragOffsetX;
+            selectedEl.y = (e.clientY - rect.top) - dragOffsetY;
+            renderCanvas();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            selectedEl = null;
+        });
+
+        function downloadCanvas() {
+            const link = document.createElement('a');
+            link.download = '나만의_소망_민화.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // 초기화 호출
+        window.onload = () => {
+            initStudyTab();
+            initStudioTab();
         };
-        const end = () => {
-          item.classList.remove("selected");
-          item.removeEventListener("pointermove", move);
-          item.removeEventListener("pointerup", end);
-          item.removeEventListener("pointercancel", end);
-        };
-        item.addEventListener("pointermove", move);
-        item.addEventListener("pointerup", end);
-        item.addEventListener("pointercancel", end);
-      });
-
-      board.appendChild(item);
-    }
-
-    symbolLibrary.forEach(symbol => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "object-button";
-      button.innerHTML = `${symbol.emoji}<span>${symbol.label}</span>`;
-      button.setAttribute("aria-label", `${symbol.label} 그림에 추가`);
-      button.addEventListener("click", () => {
-        addCreatorItem(symbol, 50, 50);
-        wishStatus.textContent = `${symbol.label}을(를) 그림에 추가했어요. 원하는 곳으로 옮겨 보세요!`;
-      });
-      objectOptions.appendChild(button);
-    });
-
-    document.getElementById("wishButton").addEventListener("click", () => {
-      const wish = document.getElementById("wishInput").value.trim();
-      if (!wish) {
-        wishStatus.textContent = "먼저 이루고 싶은 소망을 적어 주세요.";
-        return;
-      }
-      const matched = symbolLibrary.filter(symbol => symbol.keys.some(key => wish.includes(key)));
-      const suggestions = matched.length ? matched.slice(0, 4) : [symbolLibrary[0], symbolLibrary[10], symbolLibrary[8]];
-      suggestions.forEach((symbol, index) => addCreatorItem(symbol, 32 + index * 12, 48 + (index % 2) * 13));
-      const names = suggestions.map(symbol => symbol.label).join(", ");
-      wishStatus.textContent = `“${wish}”에 어울리는 사물을 골라 봤어요: ${names}. 더하고 싶은 사물은 아래에서 선택하세요!`;
-    });
-
-    const colors = [
-      { name: "따뜻한 한지", color: "linear-gradient(145deg, #e8d1a2, #f8edcf 55%, #c3a576)" },
-      { name: "맑은 하늘", color: "linear-gradient(145deg, #b9d8e6, #edf5e6 55%, #9ab7a2)" },
-      { name: "분홍 꽃밭", color: "linear-gradient(145deg, #f0c9cc, #fff0dc 55%, #d8b1a3)" },
-      { name: "초록 숲", color: "linear-gradient(145deg, #bed0a8, #e8e4bf 55%, #8eaf91)" },
-      { name: "저녁 노을", color: "linear-gradient(145deg, #e8aa7b, #f5d6a5 55%, #b97d74)" },
-      { name: "고요한 밤", color: "linear-gradient(145deg, #8998bd, #d0c8d8 55%, #717e9d)" }
-    ];
-    const colorOptions = document.getElementById("colorOptions");
-    colors.forEach((option, index) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "swatch";
-      button.style.background = option.color;
-      button.title = option.name;
-      button.setAttribute("aria-label", option.name + " 배경");
-      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
-      button.addEventListener("click", () => {
-        board.style.background = option.color;
-        colorOptions.querySelectorAll("button").forEach(item => item.setAttribute("aria-pressed", "false"));
-        button.setAttribute("aria-pressed", "true");
-      });
-      colorOptions.appendChild(button);
-    });
-
-    const moods = [
-      { name: "☀️ 밝고 씩씩하게", filter: "saturate(1.12) brightness(1.03)" },
-      { name: "🌙 차분하고 고요하게", filter: "saturate(.75) brightness(.94)" },
-      { name: "✨ 반짝반짝 신나게", filter: "saturate(1.3) contrast(1.04)" }
-    ];
-    const moodOptions = document.getElementById("moodOptions");
-    moods.forEach((mood, index) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "mood-button";
-      button.textContent = mood.name;
-      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
-      button.addEventListener("click", () => {
-        board.style.filter = mood.filter;
-        moodOptions.querySelectorAll("button").forEach(item => item.setAttribute("aria-pressed", "false"));
-        button.setAttribute("aria-pressed", "true");
-      });
-      moodOptions.appendChild(button);
-    });
-
-    document.getElementById("clearBoard").addEventListener("click", () => {
-      board.querySelectorAll(".item").forEach(item => item.remove());
-      wishStatus.textContent = "그림판을 깨끗하게 비웠어요. 새로 만들어 볼까요?";
-    });
-
-    document.getElementById("saveImage").addEventListener("click", () => {
-      const rect = board.getBoundingClientRect();
-      const background = getComputedStyle(board).backgroundColor;
-      const items = [...board.querySelectorAll(".item")].map(item => {
-        const x = parseFloat(item.style.left);
-        const y = parseFloat(item.style.top);
-        const emoji = item.firstChild.textContent;
-        return `<text x="${x}%" y="${y}%" text-anchor="middle" dominant-baseline="middle" font-size="54">${emoji}</text>`;
-      }).join("");
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(rect.width)}" height="${Math.round(rect.height)}" viewBox="0 0 ${Math.round(rect.width)} ${Math.round(rect.height)}"><rect width="100%" height="100%" fill="${background}"/><rect x="12" y="12" width="calc(100% - 24px)" height="calc(100% - 24px)" rx="12" fill="none" stroke="#fff9e9" stroke-width="2"/>${items}</svg>`;
-      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "나만의-민화.svg";
-      link.click();
-      URL.revokeObjectURL(link.href);
-      wishStatus.textContent = "작품을 이미지 파일로 저장했어요!";
-    });
-
-    updatePoints();
-    showArtwork(0);
-  </script>
+    </script>
 </body>
 </html>
