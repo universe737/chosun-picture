@@ -3,957 +3,1179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>조선 후기 민화 탐구 & 창작 스튜디오</title>
+    <title>조선 후기 민화 탐구 & 나만의 소망 민화 만들기</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Traditional Korean Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for Reward Effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hanji: '#F9F6ED',
+                        hanjiDark: '#EFEAD8',
+                        traditionalRed: '#C83232',
+                        traditionalBlue: '#2A5C8A',
+                        traditionalYellow: '#E5A93C',
+                        traditionalGreen: '#2E6F40',
+                        traditionalInk: '#222222',
+                        traditionalGold: '#D4AF37'
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        batang: ['Gowun Batang', 'serif'],
+                        pen: ['Nanum Pen Script', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --primary: #7d1c1c;
-            --primary-dark: #581010;
-            --secondary: #d4a359;
-            --bg-paper: #f4efe6;
-            --panel-bg: #ffffff;
-            --text-dark: #2c221e;
-            --accent: #2e5a44;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-        }
-
         body {
-            background-color: var(--bg-paper);
-            color: var(--text-dark);
-            background-image: radial-gradient(#d3c6b4 1px, transparent 1px);
+            background-color: #F4EFEB;
+            background-image: radial-gradient(#E2D9C8 1px, transparent 1px);
             background-size: 20px 20px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            font-family: 'Noto Sans KR', sans-serif;
+            user-select: none;
         }
 
-        header {
-            background-color: var(--primary);
-            color: #fff;
-            padding: 1.2rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border-bottom: 4px solid var(--secondary);
+        /* Hanji Texture Background Effect */
+        .hanji-card {
+            background: #FDFBF7;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.86 0 7-3.14 7-7s-3.14-7-7-7-7 3.14-7 7 3.14 7 7 7zm48 25c3.86 0 7-3.14 7-7s-3.14-7-7-7-7 3.14-7 7 3.14 7 7 7zm-43-7c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm63 31c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z' fill='%3Cpath%20d%3D%22M0%200h100v100H0z%22%20fill%3D%22none%22%2F%3E' fill-opacity='0.02'/%3E%3C/svg%3E");
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Scroll Frame Effect */
+        .jokja-frame {
+            border: 14px solid #5C3D2E;
+            border-image: linear-gradient(to right, #4A2E1B, #6A4833, #4A2E1B) 1;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
             position: relative;
         }
 
-        header h1 {
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            font-weight: 700;
-        }
-
-        header p {
-            font-size: 0.95rem;
-            color: #f1d6b8;
-            margin-top: 5px;
-        }
-
-        .score-board {
+        .jokja-frame::before, .jokja-frame::after {
+            content: '';
             position: absolute;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid var(--secondary);
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            background: #fff;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab-btn {
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            background: none;
-            cursor: pointer;
-            color: #666;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-            background-color: #fcf9f5;
-        }
-
-        main {
-            max-width: 1200px;
-            width: 100%;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            flex: 1;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 1. 학습 & 퀴즈 탭 */
-        .study-grid {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 1.5rem;
-        }
-
-        .artwork-list {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2d8cd;
-        }
-
-        .artwork-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.8rem;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 0.8rem;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            background: #fdfbf7;
-        }
-
-        .artwork-card:hover, .artwork-card.active {
-            border-color: var(--primary);
-            background: #f9f2e8;
-        }
-
-        .artwork-card img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
+            left: -20px;
+            right: -20px;
+            height: 18px;
+            background: #2D1A10;
             border-radius: 6px;
-            border: 1px solid #ccc;
+        }
+        .jokja-frame::before { top: -28px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .jokja-frame::after { bottom: -28px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1EBDD;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C2B49A;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9E8E72;
         }
 
-        .artwork-card-info h3 {
-            font-size: 1rem;
-            color: var(--primary);
+        /* Hotspot Animation */
+        .hotspot-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(200, 50, 50, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(200, 50, 50, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(200, 50, 50, 0); }
         }
 
-        .artwork-card-info p {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .viewer-container {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2d8cd;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .image-wrapper {
+        /* Canvas element selection box */
+        .canvas-container {
             position: relative;
-            width: 100%;
-            max-height: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #111;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .image-wrapper img {
-            max-width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .hotspot {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background-color: rgba(212, 163, 89, 0.85);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            transform: translate(-50%, -50%);
-            animation: pulse 1.8s infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-weight: bold;
-            font-size: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(212, 163, 89, 0.7); }
-            70% { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 0 10px rgba(212, 163, 89, 0); }
-            100% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(212, 163, 89, 0); }
-        }
-
-        .info-box {
-            background: #fdf8ef;
-            border-left: 5px solid var(--secondary);
-            padding: 1rem;
-            border-radius: 4px;
-            min-height: 70px;
-        }
-
-        .quiz-section {
-            background: #f5ece0;
-            padding: 1.2rem;
-            border-radius: 8px;
-            border: 1px dashed var(--primary);
-        }
-
-        .quiz-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .quiz-btn {
-            padding: 0.8rem;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            text-align: left;
-        }
-
-        .quiz-btn:hover {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        /* 2. 창작 스튜디오 탭 */
-        .studio-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 1.5rem;
-        }
-
-        .controls-panel {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 1.2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2d8cd;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .control-group label {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 0.95rem;
-        }
-
-        .wish-input-box {
-            display: flex;
-            gap: 5px;
-        }
-
-        .wish-input-box input {
-            flex: 1;
-            padding: 0.6rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .btn {
-            padding: 0.6rem 1rem;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .sticker-palette {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            max-height: 220px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 8px;
-            border-radius: 6px;
-            background: #fafafa;
-        }
-
-        .sticker-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 6px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-align: center;
-            transition: transform 0.1s;
-        }
-
-        .sticker-item:hover {
-            transform: scale(1.05);
-            border-color: var(--secondary);
-        }
-
-        .sticker-item canvas {
-            width: 45px;
-            height: 45px;
-        }
-
-        .canvas-area {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2d8cd;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        #mainCanvas {
-            border: 12px solid #583318;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            border-radius: 4px;
-            cursor: crosshair;
-            background-color: #f4efe6;
-        }
-
-        .canvas-actions {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        /* 풋터 */
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: #777;
-            font-size: 0.85rem;
-            border-top: 1px solid #ddd;
-            margin-top: 2rem;
-            background: #fff;
+            touch-action: none;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col text-slate-800">
 
-    <header>
-        <h1>조선 후기 민화 탐구 & 창작 스튜디오</h1>
-        <p>민화 속 사물의 의미를 탐구하고, 나의 소망을 담은 소망 민화를 직접 작성해 보세요!</p>
-        <div class="score-board">
-            <span>🎁 복주머니 포인트:</span>
-            <span id="scoreText">0</span>점
+    <!-- Header Navigation -->
+    <header class="bg-amber-900 text-amber-50 sticky top-0 z-50 shadow-md border-b-4 border-traditionalYellow">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+            <!-- App Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-traditionalYellow text-amber-950 flex items-center justify-center font-batang font-bold text-xl border-2 border-white shadow">
+                    民
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-batang font-bold tracking-wide text-amber-100 flex items-center gap-2">
+                        조선 후기 민화 탐구관
+                        <span class="text-xs bg-traditionalRed text-white px-2 py-0.5 rounded-full font-sans font-normal">초등 5학년 사회</span>
+                    </h1>
+                    <p class="text-xs text-amber-300 hidden sm:block">민화에 담긴 서민들의 소망을 알아보고 나만의 민화를 만들어보아요!</p>
+                </div>
+            </div>
+
+            <!-- Score & Navigation Tabs -->
+            <div class="flex items-center space-x-4 mt-2 sm:mt-0">
+                <!-- Point Score Bag -->
+                <div class="bg-amber-950/80 border border-amber-600/50 px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-inner">
+                    <span class="text-lg">💰</span>
+                    <span class="text-xs text-amber-200 font-medium">복주머니 포인트:</span>
+                    <span id="userPoints" class="text-traditionalYellow font-bold text-lg font-mono">0</span>
+                    <span class="text-xs text-amber-200">점</span>
+                </div>
+
+                <!-- Nav Buttons -->
+                <nav class="flex bg-amber-950 p-1 rounded-xl border border-amber-800">
+                    <button id="tab1Btn" onclick="switchTab('tab1')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-traditionalYellow text-amber-950 shadow">
+                        🎨 [탐구하기] 민화 배우기
+                    </button>
+                    <button id="tab2Btn" onclick="switchTab('tab2')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-amber-200 hover:text-white">
+                        🖌️ [창작하기] 나만의 민화
+                    </button>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <nav>
-        <button class="tab-btn active" onclick="switchTab('study')">1. 민화 탐구 & 퀴즈 게임</button>
-        <button class="tab-btn" onclick="switchTab('studio')">2. 나만의 소망 민화 만들기</button>
-    </nav>
+    <!-- Main Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
 
-    <main>
-        <!-- TAB 1: 민화 탐구 -->
-        <div id="studyTab" class="tab-content active">
-            <div class="study-grid">
-                <div class="artwork-list" id="artworkList">
-                    <!-- Dynamic Rendering -->
+        <!-- ========================================== -->
+        <!-- TAB 1: [탐구하기] 조선 후기 민화 공부 & 퀴즈 -->
+        <!-- ========================================== -->
+        <section id="tab1" class="space-y-6">
+            <!-- Mascot Guide Banner -->
+            <div class="hanji-card rounded-2xl p-4 md:p-5 border-2 border-amber-200 flex items-center gap-4 relative overflow-hidden">
+                <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-amber-100 rounded-full border-2 border-traditionalYellow flex items-center justify-center text-3xl shadow-md">
+                    🐯
                 </div>
-                <div class="viewer-container">
-                    <h2 id="artworkTitle">민화를 선택해주세요</h2>
-                    <div class="image-wrapper" id="imageWrapper">
-                        <img id="mainImage" src="" alt="민화 작품">
-                        <div id="hotspotContainer"></div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold font-batang text-amber-900 text-base md:text-lg">도우미 호돌이</span>
+                        <span class="bg-amber-200 text-amber-900 text-xs px-2 py-0.5 rounded-md font-semibold">학습 안내</span>
                     </div>
-                    <div class="info-box" id="infoBox">
-                        👉 <strong>민화 속 동그라미 번호</strong>를 클릭해 사물의 의미를 찾아보세요!
-                    </div>
-                    <div class="quiz-section">
-                        <h4 id="quizQuestion">❓ 이 민화 전체가 담고 있는 서민들의 소망은 무엇일까요?</h4>
-                        <div class="quiz-options" id="quizOptions">
-                            <!-- Dynamic Options -->
-                        </div>
-                    </div>
+                    <p class="text-sm md:text-base text-slate-700 mt-1">
+                        "조선 후기에는 서민들의 생활이 한층 향상되면서, <strong>행복, 장수, 건강, 학업 성취</strong> 등의 바람을 담은 <span class="text-traditionalRed font-bold">민화(民畫)</span>가 큰 인기를 끌었단다! 아래 민화들의 사물을 클릭해서 그 속에 담긴 특별한 의미를 찾아보렴!"
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 2: 나만의 소망 민화 스튜디오 -->
-        <div id="studioTab" class="tab-content">
-            <div class="studio-grid">
-                <div class="controls-panel">
-                    <div class="control-group">
-                        <label>1. 나의 소망 입력하기</label>
-                        <div class="wish-input-box">
-                            <input type="text" id="wishInput" placeholder="예: 시험 잘 보게 해주세요, 건강하기">
-                            <button class="btn" onclick="recommendObjects()">추천</button>
+            <!-- Minhwa Selection Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <button onclick="selectMinhwa(0)" id="minhwaCard0" class="minhwa-select-btn hanji-card p-3 rounded-xl border-2 border-traditionalYellow transition-all duration-200 text-left hover:scale-[1.02] shadow-sm">
+                    <div class="text-xs font-bold text-traditionalRed mb-1">액운을 막고 기쁜 소식을!</div>
+                    <div class="font-batang font-bold text-slate-900 text-base flex items-center justify-between">
+                        🐯 호작도 (까치와 호랑이)
+                        <span class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded hidden status-badge">완료</span>
+                    </div>
+                </button>
+                <button onclick="selectMinhwa(1)" id="minhwaCard1" class="minhwa-select-btn hanji-card p-3 rounded-xl border-2 border-transparent transition-all duration-200 text-left hover:scale-[1.02] shadow-sm">
+                    <div class="text-xs font-bold text-traditionalBlue mb-1">학문과 공부에 힘쓰기</div>
+                    <div class="font-batang font-bold text-slate-900 text-base flex items-center justify-between">
+                        📚 책거리 (책가도)
+                        <span class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded hidden status-badge">완료</span>
+                    </div>
+                </button>
+                <button onclick="selectMinhwa(2)" id="minhwaCard2" class="minhwa-select-btn hanji-card p-3 rounded-xl border-2 border-transparent transition-all duration-200 text-left hover:scale-[1.02] shadow-sm">
+                    <div class="text-xs font-bold text-traditionalGreen mb-1">유교적 덕목과 교훈</div>
+                    <div class="font-batang font-bold text-slate-900 text-base flex items-center justify-between">
+                        ✍️ 문자도 (효·제·충·신)
+                        <span class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded hidden status-badge">완료</span>
+                    </div>
+                </button>
+                <button onclick="selectMinhwa(3)" id="minhwaCard3" class="minhwa-select-btn hanji-card p-3 rounded-xl border-2 border-transparent transition-all duration-200 text-left hover:scale-[1.02] shadow-sm">
+                    <div class="text-xs font-bold text-purple-700 mb-1">부귀영화와 화목한 가정</div>
+                    <div class="font-batang font-bold text-slate-900 text-base flex items-center justify-between">
+                        🌸 화조도 (꽃과 새)
+                        <span class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded hidden status-badge">완료</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Main Interactive Learning Display Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left: Minhwa Viewport with SVG Hotspots -->
+                <div class="lg:col-span-7 hanji-card p-4 md:p-6 rounded-2xl border border-amber-200 flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-magnifying-glass"></i> 사물 반짝이를 클릭해 의미를 밝혀보세요!
+                        </span>
+                        <span id="explorationProgress" class="text-xs font-bold text-slate-500">발견: 0/3</span>
+                    </div>
+
+                    <!-- Minhwa Canvas / Image Container -->
+                    <div class="relative w-full max-w-md aspect-[3/4] rounded-xl overflow-hidden shadow-lg border-4 border-amber-900/40 bg-amber-50">
+                        <!-- SVG Simulated Paintings -->
+                        <svg id="minhwaSvg" class="w-full h-full object-cover" viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dynamic Content Rendered via JS -->
+                        </svg>
+
+                        <!-- Hotspot Overlays container -->
+                        <div id="hotspotContainer" class="absolute inset-0 pointer-events-none">
+                            <!-- Hotspot Buttons Rendered via JS -->
                         </div>
                     </div>
 
-                    <div class="control-group">
-                        <label>2. 민화 배경 색상선택</label>
-                        <select id="bgColorSelect" onchange="changeBgColor()" style="padding:0.5rem; border-radius:4px; border:1px solid #ccc;">
-                            <option value="#f4efe6">기본 한지 색상 (은은한 베이지)</option>
-                            <option value="#e8ded1">고풍스러운 고서화색</option>
-                            <option value="#e5eee6">청아한 오방색 청(靑) 느낌</option>
-                            <option value="#f9ebea">따뜻한 오방색 적(赤) 느낌</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label>3. 사물 스티커 선택 (클릭 시 캔버스 배치)</label>
-                        <div class="sticker-palette" id="stickerPalette">
-                            <!-- Canvas Generated Icons -->
-                        </div>
-                    </div>
-
-                    <div class="control-group">
-                        <label>4. 족자 글귀 (소망 문구)</label>
-                        <input type="text" id="canvasText" placeholder="캔버스에 적을 글귀" style="padding:0.5rem; border-radius:4px; border:1px solid #ccc;">
-                        <button class="btn" onclick="addTextToCanvas()" style="margin-top:5px; background:var(--accent);">글귀 추가하기</button>
-                    </div>
-
-                    <div class="control-group">
-                        <button class="btn" onclick="clearCanvas()" style="background:#777;">캔버스 초기화</button>
-                    </div>
+                    <p class="text-xs text-slate-400 mt-3 text-center">※ 그림 위의 반짝이는 핫스팟 아이콘을 터치하거나 마우스를 올려보세요.</p>
                 </div>
 
-                <div class="canvas-area">
-                    <canvas id="mainCanvas" width="600" height="700"></canvas>
-                    <div class="canvas-actions">
-                        <button class="btn" onclick="downloadCanvas()" style="font-size:1.1rem; padding:0.8rem 2rem; background:var(--primary);">📜 나만의 소망 민화 완성작 저장하기 (PNG)</button>
+                <!-- Right: Information & Quiz Panel -->
+                <div class="lg:col-span-5 space-y-5">
+                    
+                    <!-- Object Info Card (Triggered by Hotspot Hover/Click) -->
+                    <div id="objectInfoCard" class="hanji-card p-5 rounded-2xl border-2 border-traditionalYellow shadow-md min-h-[160px] flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span id="objIcon" class="text-3xl p-2 bg-amber-100 rounded-xl">🔍</span>
+                            <div>
+                                <h3 id="objTitle" class="font-batang font-bold text-xl text-amber-950">사물을 선택해보세요</h3>
+                                <p id="objSubtitle" class="text-xs text-amber-700">민화 속 사물에는 서민들의 소망이 들어있어요.</p>
+                            </div>
+                        </div>
+                        <p id="objDesc" class="text-sm text-slate-700 leading-relaxed bg-amber-50/60 p-3 rounded-lg border border-amber-100 mt-1">
+                            왼쪽 민화에서 반짝이는 포인트를 클릭하거나 마우스를 올리면, 해당 사물이 상징하는 조선 시대 사람들의 바람과 의미가 나타납니다.
+                        </p>
                     </div>
+
+                    <!-- Minhwa Overall Quiz Section -->
+                    <div class="hanji-card p-5 rounded-2xl border-2 border-amber-300 shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-traditionalRed text-white text-xs px-2.5 py-1 rounded-full font-bold">퀴즈</span>
+                                <h4 class="font-batang font-bold text-slate-900 text-lg">민화 전체 의미 추측하기</h4>
+                            </div>
+                            <span class="text-xs text-traditionalGold font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-coins"></i> +50 P
+                            </span>
+                        </div>
+
+                        <p id="quizQuestion" class="text-sm text-slate-800 font-medium mb-4 leading-relaxed">
+                            질문이 여기에 표시됩니다.
+                        </p>
+
+                        <!-- Options List -->
+                        <div id="quizOptions" class="space-y-2">
+                            <!-- Dynamically generated buttons -->
+                        </div>
+
+                        <!-- Quiz Feedback Alert -->
+                        <div id="quizFeedback" class="mt-4 p-3 rounded-xl text-xs font-bold text-center hidden">
+                            <!-- Correct / Incorrect message -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: [창작하기] 나만의 소망 민화 스튜디오 -->
+        <!-- ========================================== -->
+        <section id="tab2" class="space-y-6 hidden">
+            <!-- Studio Header Guide -->
+            <div class="hanji-card rounded-2xl p-4 md:p-5 border-2 border-amber-200 flex items-center gap-4">
+                <div class="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 bg-traditionalRed/10 rounded-full border-2 border-traditionalRed flex items-center justify-center text-3xl">
+                    🖌️
+                </div>
+                <div class="flex-grow">
+                    <h2 class="font-batang font-bold text-amber-950 text-lg md:text-xl">나만의 소망 민화 스튜디오</h2>
+                    <p class="text-xs md:text-sm text-slate-600">
+                        내가 간절히 원하는 소망을 적고, 그 소망을 이뤄줄 조선 시대 사물 스티커를 족자에 예쁘게 배치해 보세요!
+                    </p>
                 </div>
             </div>
-        </div>
+
+            <!-- Wish Input & Object Recommendation Banner -->
+            <div class="hanji-card p-5 rounded-2xl border border-amber-300 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center gap-3">
+                    <label class="font-batang font-bold text-amber-900 text-sm whitespace-nowrap flex items-center gap-1">
+                        ✨ 나의 소망 적기:
+                    </label>
+                    <div class="flex-grow flex gap-2">
+                        <input type="text" id="wishInput" placeholder="예: 시험을 잘 보게 해주세요, 가족 모두 건강하게 해주세요..." 
+                            class="w-full px-4 py-2 text-sm rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-traditionalYellow bg-white">
+                        <button onclick="analyzeWish()" class="px-4 py-2 bg-traditionalRed hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow transition-all whitespace-nowrap">
+                            사물 추천받기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Wish Tag Buttons -->
+                <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-amber-100">
+                    <span class="text-xs text-slate-500 font-bold">추천 소망 태그:</span>
+                    <button onclick="setWishTag('시험 합격과 학업 성취')" class="px-2.5 py-1 text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full">📚 학업 성취</button>
+                    <button onclick="setWishTag('가족들의 건강과 무병장수')" class="px-2.5 py-1 text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full">🐢 무병 장수</button>
+                    <button onclick="setWishTag('좋은 친구들과의 깊은 우정')" class="px-2.5 py-1 text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full">🌸 화목과 우정</button>
+                    <button onclick="setWishTag('나쁜 운을 막고 행복 가득')" class="px-2.5 py-1 text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full">🐯 액운 퇴치</button>
+                </div>
+
+                <!-- Recommendation Result Box -->
+                <div id="recommendResult" class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 text-xs text-slate-700 hidden">
+                    <span class="font-bold text-traditionalRed">💡 추천 사물: </span>
+                    <span id="recommendText"></span>
+                </div>
+            </div>
+
+            <!-- Studio Main Editor Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Control Palette (Left Column) -->
+                <div class="lg:col-span-5 space-y-4">
+
+                    <!-- 1. Scroll & Background Setting -->
+                    <div class="hanji-card p-4 rounded-xl border border-amber-200">
+                        <h3 class="font-batang font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-traditionalRed"></span> 1. 족자 배경 및 종이 색상
+                        </h3>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="setCanvasBg('#F9F6ED', '은은한 한지')" class="p-2 rounded-lg border border-amber-300 text-xs text-center hover:bg-amber-100 bg-[#F9F6ED]">
+                                은은한 한지
+                            </button>
+                            <button onclick="setCanvasBg('#F4E8C1', '황토 빛깔')" class="p-2 rounded-lg border border-amber-300 text-xs text-center hover:bg-amber-100 bg-[#F4E8C1]">
+                                황토 빛깔
+                            </button>
+                            <button onclick="setCanvasBg('#E3ECF5', '청아한 은빛')" class="p-2 rounded-lg border border-amber-300 text-xs text-center hover:bg-amber-100 bg-[#E3ECF5]">
+                                청아한 은빛
+                            </button>
+                            <button onclick="setCanvasBg('#FCE4E4', '연홍빛 단풍')" class="p-2 rounded-lg border border-amber-300 text-xs text-center hover:bg-amber-100 bg-[#FCE4E4]">
+                                연홍빛 단풍
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Sticker Objects Collection -->
+                    <div class="hanji-card p-4 rounded-xl border border-amber-200">
+                        <h3 class="font-batang font-bold text-slate-900 text-sm mb-3 flex items-center justify-between">
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-traditionalBlue"></span> 2. 민화 사물 스티커 클릭하여 추가</span>
+                            <span class="text-[11px] text-slate-400 font-normal">클릭시 캔버스에 생성</span>
+                        </h3>
+
+                        <!-- Category Selector -->
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <button onclick="filterStickers('all')" class="sticker-cat-btn py-1 text-xs rounded bg-amber-900 text-white font-medium">전체</button>
+                            <button onclick="filterStickers('blessing')" class="sticker-cat-btn py-1 text-xs rounded bg-amber-100 text-amber-900 font-medium">복/행운</button>
+                            <button onclick="filterStickers('study')" class="sticker-cat-btn py-1 text-xs rounded bg-amber-100 text-amber-900 font-medium">학업/장수</button>
+                        </div>
+
+                        <!-- Sticker Grid -->
+                        <div id="stickerGrid" class="grid grid-cols-4 gap-2.5 max-h-56 overflow-y-auto p-1">
+                            <!-- Stickers injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Text & Calligraphy Add -->
+                    <div class="hanji-card p-4 rounded-xl border border-amber-200">
+                        <h3 class="font-batang font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-traditionalGreen"></span> 3. 소망 문구 및 낙관 추가
+                        </h3>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="canvasTextInput" placeholder="예: 소망성취 (所望成就)" 
+                                class="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-white">
+                            <button onclick="addTextToCanvas()" class="px-3 py-1.5 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs rounded-lg whitespace-nowrap">
+                                글씨 추가
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="addStampToCanvas()" class="w-full py-1.5 bg-traditionalRed/10 hover:bg-traditionalRed/20 text-traditionalRed font-bold text-xs rounded-lg border border-traditionalRed/30 flex items-center justify-center gap-1">
+                                🧧 붉은 도장(낙관) 찍기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Object Fine Control -->
+                    <div id="elementControlPanel" class="hanji-card p-4 rounded-xl border-2 border-traditionalYellow hidden">
+                        <h3 class="font-batang font-bold text-slate-900 text-sm mb-2 flex items-center justify-between">
+                            <span>⚙️ 선택한 사물 조절하기</span>
+                            <button onclick="deleteSelectedElement()" class="text-xs text-red-600 hover:underline">
+                                <i class="fa-solid fa-trash"></i> 삭제
+                            </button>
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="text-slate-600 block mb-1">크기 조절</label>
+                                <input type="range" id="scaleSlider" min="0.3" max="2.5" step="0.1" value="1" oninput="updateSelectedScale(this.value)" class="w-full accent-amber-700">
+                            </div>
+                            <div>
+                                <label class="text-slate-600 block mb-1">회전하기</label>
+                                <input type="range" id="rotateSlider" min="0" max="360" step="5" value="0" oninput="updateSelectedRotate(this.value)" class="w-full accent-amber-700">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Canvas Viewport (Right Column) -->
+                <div class="lg:col-span-7 flex flex-col items-center">
+                    
+                    <!-- Scroll Frame Canvas Container -->
+                    <div class="jokja-frame bg-amber-50 rounded-sm p-3 shadow-2xl max-w-full">
+                        <div class="canvas-container relative overflow-hidden shadow-inner">
+                            <canvas id="minhwaCanvas" width="380" height="500" class="cursor-crosshair bg-hanji block"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
+                        <button onclick="clearCanvasElements()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                            <i class="fa-solid fa-rotate-left"></i> 전체 초기화
+                        </button>
+                        <button onclick="downloadMinhwa()" class="px-6 py-2.5 bg-traditionalRed hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> 내 족자 그림 저장하기 (PNG)
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
     </main>
 
-    <footer>
-        <p>초등학교 5학년 사회과 조선 후기 서민 문화 - 민화 학습 도구 | 문화재청 및 국립중앙박물관 공공 누리/위키미디어 공공 데이터 활용</p>
+    <!-- Footer -->
+    <footer class="bg-amber-950 text-amber-300/60 text-xs text-center py-4 border-t border-amber-900 mt-8">
+        <p>초등학교 5학년 사회 - 조선 후기의 사회와 문화 탐구 학습 교구 | ⓒ 2026 민화 익힘책</p>
     </footer>
 
+    <!-- JavaScript Application Logic -->
     <script>
-        // 조선후기 실제 민화 이미지 (Wikimedia / 공공누리 공공저작물)
-        const artworks = [
+        /* ==========================================================================
+           1. DATA STRUCTURES (Minhwa Data & Sticker Items)
+           ========================================================================== */
+        
+        // Tab 1: Minhwa Exploration Data
+        const minhwaData = [
             {
                 id: 'hojakdo',
-                title: '호작도 (호랑이와 까치)',
-                period: '조선 후기 (19세기)',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Minhwa-Hojakdo-01.jpg/600px-Minhwa-Hojakdo-01.jpg',
-                description: '조선 후기 서민들이 새해를 맞아 액운을 막고 기쁜 소식을 기원하며 대문에 붙이던 대표적인 민화입니다.',
-                hotspots: [
-                    { x: 50, y: 55, num: 1, name: '호랑이', meaning: '액운과 나쁜 기운을 물리쳐주는 영험한 영물(신령스러운 동물)을 상징합니다.' },
-                    { x: 35, y: 18, num: 2, name: '까치', meaning: '기쁜 소식과 좋은 일(길조)을 전해주는 전령을 상징합니다.' },
-                    { x: 75, y: 25, num: 3, name: '소나무', meaning: '새해의 시작과 장수, 변함없는 지조와 절개를 상징합니다.' }
-                ],
+                title: '호작도 (까치와 호랑이)',
+                subtitle: '기쁜 소식을 가져다주고 액운을 막아주는 민화',
+                desc: '호랑이는 얼핏 무섭게 생겼지만 해학적으로 그려져 액운을 쫓아주고, 까치는 좋은 소식을 전해준다고 믿었습니다.',
                 quiz: {
-                    question: '이 호작도 그림이 담고 있는 조선 시대 서민들의 주요 소망은 무엇일까요?',
+                    question: '조선시대 서민들이 집 대문에 <호작도>를 붙여놓은 가장 큰 이유는 무엇이었을까요?',
                     options: [
-                        { text: '나쁜 액운을 막고 기쁜 소식이 찾아오길 바라는 소망', correct: true },
-                        { text: '벼슬자리에 올라 부귀영화와 권력을 누리려는 소망', correct: false },
-                        { text: '학문에 매진하여 훌륭한 학자가 되려는 소망', correct: false },
-                        { text: '자식을 많이 낳아 가문을 번창시키려는 소망', correct: false }
-                    ]
+                        { text: '호랑이의 사냥 기술을 배우고 싶어서', isCorrect: false },
+                        { text: '새해에 나쁜 기운(액운)을 막고 기쁜 소식이 오기를 바라서', isCorrect: true },
+                        { text: '까치에게 밥을 주기 위해서', isCorrect: false },
+                        { text: '소나무 그림을 자랑하고 싶어서', isCorrect: false }
+                    ],
+                    explanation: '정답입니다! 호랑이는 액막이, 까치는 기쁜 소식을 의미하여 새해 대문에 붙여 기원했습니다.'
+                },
+                hotspots: [
+                    { id: 'tiger', name: '호랑이', icon: '🐯', cx: 200, cy: 300, r: 25, title: '호랑이 (벽사 - 액운 퇴치)', desc: '나쁜 기운과 액운을 쫓아내고 가정의 평화를 지켜준다는 상징입니다. 엉뚱하고 친근하게 그려진 것이 특징입니다.' },
+                    { id: 'magpie', name: '까치', icon: '🐦', cx: 120, cy: 120, r: 20, title: '까치 (보희 - 기쁜 소식)', desc: '기쁜 소식과 좋은 손님을 가져다주는 전령으로 여겨졌습니다. 호랑이에게 기쁜 소식을 전달하는 모습입니다.' },
+                    { id: 'pine', name: '소나무', icon: '🌲', cx: 290, cy: 150, r: 22, title: '소나무 (장수와 지조)', desc: '사계절 내내 푸르름을 잃지 않아 건강하게 오래 사는 장수와 변치 않는 지조를 의미합니다.' }
+                ],
+                renderSvg: function() {
+                    return `
+                        <rect width="400" height="533" fill="#F3EAD3" />
+                        <!-- Pine Tree -->
+                        <path d="M 320 533 C 310 380, 260 250, 280 80" stroke="#5C3D2E" stroke-width="28" fill="none" stroke-linecap="round"/>
+                        <path d="M 280 180 C 200 160, 150 140, 100 130" stroke="#5C3D2E" stroke-width="14" fill="none" stroke-linecap="round"/>
+                        <!-- Pine Needles -->
+                        <circle cx="280" cy="80" r="45" fill="#2E6F40" opacity="0.85"/>
+                        <circle cx="230" cy="120" r="35" fill="#2E6F40" opacity="0.85"/>
+                        <circle cx="120" cy="110" r="30" fill="#2E6F40" opacity="0.85"/>
+                        
+                        <!-- Friendly Tiger Base -->
+                        <path d="M 120 480 C 130 320, 260 310, 270 480 Z" fill="#E5A93C"/>
+                        <!-- Stripes -->
+                        <path d="M 160 380 Q 200 390 240 380" stroke="#222" stroke-width="6" fill="none"/>
+                        <path d="M 150 420 Q 200 430 250 420" stroke="#222" stroke-width="6" fill="none"/>
+                        <!-- Tiger Head -->
+                        <circle cx="200" cy="280" r="65" fill="#E5A93C" stroke="#222" stroke-width="3"/>
+                        <circle cx="170" cy="225" r="16" fill="#E5A93C" stroke="#222" stroke-width="3"/>
+                        <circle cx="230" cy="225" r="16" fill="#E5A93C" stroke="#222" stroke-width="3"/>
+                        <!-- Eyes & Big Smile -->
+                        <circle cx="175" cy="270" r="12" fill="#FFF"/>
+                        <circle cx="225" cy="270" r="12" fill="#FFF"/>
+                        <circle cx="175" cy="270" r="5" fill="#222"/>
+                        <circle cx="225" cy="270" r="5" fill="#222"/>
+                        <path d="M 185 305 Q 200 325 215 305" stroke="#C83232" stroke-width="5" fill="none"/>
+                        <!-- Tail -->
+                        <path d="M 260 440 Q 340 400 310 320" stroke="#E5A93C" stroke-width="16" fill="none" stroke-linecap="round"/>
+                        <path d="M 260 440 Q 340 400 310 320" stroke="#222" stroke-width="4" stroke-dasharray="10 10" fill="none" stroke-linecap="round"/>
+
+                        <!-- Magpie Bird -->
+                        <path d="M 100 140 Q 130 130 145 155 Q 120 170 95 155 Z" fill="#2A5C8A"/>
+                        <circle cx="138" cy="142" r="8" fill="#222"/>
+                        <polygon points="146,140 160,143 146,147" fill="#E5A93C"/>
+                        <!-- Wing -->
+                        <path d="M 110 150 Q 80 180 60 160" stroke="#FFF" stroke-width="4" fill="none"/>
+                    `;
                 }
             },
             {
                 id: 'chaekgeori',
                 title: '책거리 (책가도)',
-                period: '조선 후기 (18~19세기)',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Chaekgeori-19th_century.jpg/600px-Chaekgeori-19th_century.jpg',
-                description: '책과 여러 가지 문방구, 선비의 물품들을 그린 그림으로 학문 사랑과 출세를 기원했습니다.',
-                hotspots: [
-                    { x: 48, y: 35, num: 1, name: '쌓인 책들', meaning: '학문에 힘써 깊은 지식을 쌓고 학업을 성취하길 바라는 소망입니다.' },
-                    { x: 28, y: 65, num: 2, name: '붓과 먹', meaning: '벼슬길에 올라 출세하고 나라에 이바지하려는 선비의 덕목을 뜻합니다.' },
-                    { x: 70, y: 60, num: 3, name: '도자기와 복숭아', meaning: '평안함(도자기)과 장수(복숭아)를 기원하는 고풍스러운 장식물입니다.' }
-                ],
+                subtitle: '학문에 힘쓰고 출세하기를 바라는 서가 그림',
+                desc: '정조 대왕 시대부터 유행한 그림으로 높은 책가 안에 책과 문방사우(붓, 먹, 종이, 벼루), 선비의 물건을 그린 민화입니다.',
                 quiz: {
-                    question: '책거리(책가도)를 방에 걸어두며 서민과 선비들이 빌었던 염원은 무엇일까요?',
+                    question: '조선시대 학부모님들과 학생들이 방에 <책거리> 그림을 걸어둔 까닭은 무엇일까요?',
                     options: [
-                        { text: '부지런히 학문을 탐구하여 출세하고 지혜로워지기를 기원함', correct: true },
-                        { text: '외적의 침입으로부터 나라를 보호하기를 기원함', correct: false },
-                        { text: '농사가 풍년이 들기를 기원함', correct: false },
-                        { text: '바다로 나간 배가 안전하게 돌아오기를 기원함', correct: false }
-                    ]
+                        { text: '책을 사지 않고 그림으로 대체하려고', isCorrect: false },
+                        { text: '학업에 힘써 높은 벼슬에 오르고 지식을 쌓기를 소망해서', isCorrect: true },
+                        { text: '방안의 도서관 인테리어를 위해서', isCorrect: false },
+                        { text: '그림 속에 비밀 지도를 숨기기 위해서', isCorrect: false }
+                    ],
+                    explanation: '정답입니다! 책거리는 공부를 열심히 하여 학문적 성취를 이루고자 하는 열망이 담겨 있습니다.'
+                },
+                hotspots: [
+                    { id: 'books', name: '책더미', icon: '📚', cx: 160, cy: 220, r: 25, title: '쌓인 책 (학업 성취 & 지식)', desc: '학문을 숭상하고 지식을 깊게 쌓아 훌륭한 인재가 되기를 바라는 마음을 뜻합니다.' },
+                    { id: 'brush', name: '붓과 벼루', icon: '🖌️', cx: 280, cy: 310, r: 22, title: '문방사우 (출세와 과거 합격)', desc: '글을 열심히 써서 과거 시험에 합격하고 나라의 중요한 벼슬길에 오르기를 기원합니다.' },
+                    { id: 'peacock', name: '깃털과 도자기', icon: '🏺', cx: 280, cy: 160, r: 22, title: '화병과 도자기 (평안과 부귀)', desc: '화병(꽃병)의 병자 발음이 평안함(平安)과 같아 집안의 평화를 상징합니다.' }
+                ],
+                renderSvg: function() {
+                    return `
+                        <rect width="400" height="533" fill="#EDE4CE" />
+                        <!-- Wooden Bookshelf -->
+                        <rect x="40" y="40" width="320" height="453" fill="none" stroke="#6A4833" stroke-width="16"/>
+                        <line x1="40" y1="190" x2="360" y2="190" stroke="#6A4833" stroke-width="12"/>
+                        <line x1="40" y1="340" x2="360" y2="340" stroke="#6A4833" stroke-width="12"/>
+
+                        <!-- Stacked Books Top Shelf -->
+                        <rect x="80" y="110" width="130" height="70" fill="#2A5C8A" rx="4"/>
+                        <rect x="90" y="85" width="110" height="25" fill="#C83232" rx="3"/>
+                        <line x1="80" y1="140" x2="210" y2="140" stroke="#FFF" stroke-width="2" stroke-dasharray="4 4"/>
+
+                        <!-- Porcelain Vase -->
+                        <path d="M 270 120 C 250 140, 250 170, 270 180 L 290 180 C 310 170, 310 140, 290 120 Z" fill="#FFF" stroke="#2A5C8A" stroke-width="3"/>
+                        <path d="M 280 90 L 280 120" stroke="#2E6F40" stroke-width="6"/>
+
+                        <!-- Inkstone & Brush -->
+                        <rect x="240" y="290" width="80" height="40" fill="#222" rx="6"/>
+                        <polygon points="120,260 140,330 160,330 180,260" fill="#E5A93C"/>
+                    `;
                 }
             },
             {
                 id: 'munjado',
-                title: '문자도 (효·제·충·신...)',
-                period: '조선 후기 (19세기)',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Munjado-Hyo.jpg/500px-Munjado-Hyo.jpg',
-                description: '유교의 핵심 덕목인 글자(효, 제, 충, 신 등)에 상징적인 고사 속 상징물을 함께 넣어 장식한 민화입니다.',
-                hotspots: [
-                    { x: 50, y: 40, num: 1, name: '효(孝) 자 모양', meaning: '부모님께 효도하고 가족 간에 사랑하며 우애 있게 지내야 한다는 유교적 가치관입니다.' },
-                    { x: 30, y: 70, num: 2, name: '잉어', meaning: '병석의 부모님을 위해 추운 겨울 얼음을 깨고 잉어를 구한 효자 고사에서 나온 상징입니다.' },
-                    { x: 75, y: 25, num: 3, name: '거문고', meaning: '부모님의 마음을 기쁘게 해드리고 마음의 평화를 찾는 상징물입니다.' }
-                ],
+                title: '문자도 (효·제·충·신)',
+                subtitle: '사람으로서 지켜야 할 중요한 덕목을 담은 그림',
+                desc: '유교적 교훈이 담긴 글자(효, 제, 충, 신, 예, 의, 염, 치)에 관련된 전설이나 이야기를 아름다운 동물 및 사물로 표현했습니다.',
                 quiz: {
-                    question: '문자도를 통해 조선 서민들이 아이들에게 가르치고자 했던 바는 무엇일까요?',
+                    question: '문자도에서 <孝(효도 효)> 자에 ' + '거문고나 잉어, 죽순이 함께 그려진 이유는 무엇일까요?',
                     options: [
-                        { text: '효도, 우애, 충성 등 사람이 지켜야 할 바른 도리와 덕목', correct: true },
-                        { text: '장사를 잘 하여 돈을 많이 버는 방법', correct: false },
-                        { text: '무술을 연마하여 싸움에서 이기는 기술', correct: false },
-                        { text: '외국어 표현을 빠르게 익히는 요령', correct: false }
-                    ]
+                        { text: '글자를 예쁘게 꾸며 글씨 쓰기 연습을 하려고', isCorrect: false },
+                        { text: '부모님께 효도를 다한 옛이야기 속 상징들을 담았기 때문에', isCorrect: true },
+                        { text: '글자를 읽지 못하는 사람들을 속이려고', isCorrect: false },
+                        { text: '어부들이 물고기를 많이 잡게 해 달라고', isCorrect: false }
+                    ],
+                    explanation: '정답입니다! 추운 겨울 부모님을 위해 얼음을 깨고 잉어를 잡은 효자의 전설 등이 문자에 녹아있습니다.'
+                },
+                hotspots: [
+                    { id: 'carp', name: '잉어', icon: '🐟', cx: 160, cy: 300, r: 24, title: '잉어 (부모님에 대한 효성)', desc: '겨울철 부모님을 위해 얼음을 뚫고 구한 잉어 전설에서 유래하여 부모를 향한 깊은 효도를 상징합니다.' },
+                    { id: 'bamboo', name: '죽순/대나무', icon: '🎋', cx: 270, cy: 180, r: 22, title: '죽순 (효도와 변치 않는 마음)', desc: '눈 속에서 부모를 위해 눈물로 싹을 틔운 죽순 전설로 지극한 효심을 뜻합니다.' },
+                    { id: 'character', name: '효(孝) 자', icon: '✍️', cx: 200, cy: 120, r: 26, title: '효도 효(孝) 글씨', desc: '부모를 섬기는 도리를 잊지 않도록 아이들 방에 걸어둔 핵심 글자입니다.' }
+                ],
+                renderSvg: function() {
+                    return `
+                        <rect width="400" height="533" fill="#F4EFE6" />
+                        <!-- Decorative Frame -->
+                        <rect x="20" y="20" width="360" height="493" fill="none" stroke="#C83232" stroke-width="4" stroke-dasharray="12 6"/>
+
+                        <!-- Big Character Calligraphy "孝" Stylized -->
+                        <text x="200" y="240" font-family="serif" font-size="200" font-weight="bold" fill="#222" text-anchor="middle" opacity="0.15">孝</text>
+                        
+                        <!-- Main Character Stroke Art -->
+                        <path d="M 120 120 Q 200 80 280 120" stroke="#222" stroke-width="24" stroke-linecap="round" fill="none"/>
+                        <path d="M 200 110 L 200 360" stroke="#222" stroke-width="20" fill="none"/>
+
+                        <!-- Carp Fish Overlay on Stroke -->
+                        <path d="M 120 300 C 150 250, 200 280, 230 320 C 190 350, 140 330, 120 300 Z" fill="#C83232"/>
+                        <circle cx="210" cy="305" r="4" fill="#FFF"/>
+
+                        <!-- Bamboo Sprouts -->
+                        <path d="M 260 220 L 290 140 M 275 180 L 310 170" stroke="#2E6F40" stroke-width="8" stroke-linecap="round"/>
+                    `;
                 }
             },
             {
                 id: 'hwajodo',
                 title: '화조도 (꽃과 새)',
-                period: '조선 후기 (19세기)',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Korean_Minhwa-Hwajodo.jpg/500px-Korean_Minhwa-Hwajodo.jpg',
-                description: '아름다운 꽃과 한 쌍의 새를 그려 가정의 화목과 다정함, 화창한 봄날 같은 행복을 기원했습니다.',
-                hotspots: [
-                    { x: 45, y: 35, num: 1, name: '한 쌍의 새', meaning: '부부 간의 사랑과 가족 모두가 서로 화목하게 지내는 것을 상징합니다.' },
-                    { x: 60, y: 65, num: 2, name: '모란꽃', meaning: '꽃 중의 왕으로 불리며, 부귀영화와 화창한 삶을 상징합니다.' },
-                    { x: 25, y: 75, num: 3, name: '바위', meaning: '오랜 세월 변함없는 건강과 영원한 장수를 상징합니다.' }
-                ],
+                subtitle: '부부간의 사랑과 가정의 화목을 기원하는 그림',
+                desc: '아름다운 모란꽃과 함께 다정한 한 쌍의 새를 그린 민화로, 안방이나 신혼집을 꾸밀 때 많이 사용되었습니다.',
                 quiz: {
-                    question: '화조도(꽃과 새 그림)를 가정에 걸어둠으로써 기대했던 바는 무엇일까요?',
+                    question: '<화조도>에서 꽃과 다정한 새 한 쌍이 함께 그려진 이유는 무엇일까요?',
                     options: [
-                        { text: '가정이 화목하고 부귀와 행복이 가득하기를 기원함', correct: true },
-                        { text: '귀신을 물리치고 엄격한 질서를 세우기를 기원함', correct: false },
-                        { text: '비가 많이 내려 가뭄을 해결하기를 기원함', correct: false },
-                        { text: '어려운 시험에 일등으로 합격하기만을 기원함', correct: false }
-                    ]
+                        { text: '새들에게 꽃향기를 맡게 하려고', isCorrect: false },
+                        { text: '가족이 늘 화목하고 부부 사이가 사랑스럽길 바라서', isCorrect: true },
+                        { text: '봄이 왔음을 알리는 기상청 역할', isCorrect: false },
+                        { text: '식물학자가 연구하기 위해서', isCorrect: false }
+                    ],
+                    explanation: '정답입니다! 화조도는 부부의 화목함과 집안에 봄날 같은 따뜻한 행복이 가득하기를 기원합니다.'
+                },
+                hotspots: [
+                    { id: 'peony', name: '모란꽃', icon: '🌺', cx: 160, cy: 340, r: 26, title: '모란꽃 (부귀영화)', desc: '꽃 중의 왕이라 불리는 모란은 부귀와 영화로움, 풍요로운 삶을 뜻합니다.' },
+                    { id: 'birds', name: '다정한 새 한쌍', icon: '🐦', cx: 220, cy: 160, r: 25, title: '새 한 쌍 (부부 화목 & 사랑)', desc: '암수 한 쌍이 함께 지저귀며 사랑과 가문의 화목함을 표현합니다.' },
+                    { id: 'rock', name: '괴석(바위)', icon: '🪨', cx: 280, cy: 400, r: 22, title: '괴석/바위 (장수와 변치 않음)', desc: '세월이 지나도 변하지 않는 바위처럼 오랜 시간 건강하게 함께 살기를 기원합니다.' }
+                ],
+                renderSvg: function() {
+                    return `
+                        <rect width="400" height="533" fill="#FBF6EC" />
+                        <!-- Rock Base -->
+                        <path d="M 220 533 Q 280 360 360 420 L 400 533 Z" fill="#8C7A6B"/>
+                        
+                        <!-- Peony Flowers -->
+                        <circle cx="150" cy="340" r="45" fill="#C83232" opacity="0.9"/>
+                        <circle cx="150" cy="340" r="30" fill="#E5A93C" opacity="0.8"/>
+                        <circle cx="150" cy="340" r="15" fill="#FFF"/>
+
+                        <circle cx="230" cy="270" r="35" fill="#E86A92" opacity="0.9"/>
+                        <circle cx="230" cy="270" r="20" fill="#FFF"/>
+
+                        <!-- Stem and Leaves -->
+                        <path d="M 150 533 Q 120 420 150 340" stroke="#2E6F40" stroke-width="10" fill="none"/>
+                        <circle cx="110" cy="380" r="20" fill="#2E6F40"/>
+                        <circle cx="190" cy="400" r="22" fill="#2E6F40"/>
+
+                        <!-- Pair of Birds on Branch -->
+                        <path d="M 80 180 Q 220 140 320 200" stroke="#5C3D2E" stroke-width="8" fill="none"/>
+                        
+                        <!-- Bird 1 -->
+                        <circle cx="180" cy="140" r="16" fill="#2A5C8A"/>
+                        <circle cx="170" cy="155" r="20" fill="#C83232"/>
+                        <!-- Bird 2 -->
+                        <circle cx="230" cy="135" r="14" fill="#2E6F40"/>
+                        <circle cx="242" cy="150" r="18" fill="#E5A93C"/>
+                    `;
                 }
             }
         ];
 
-        // 스티커 그래픽 생성용 정의
-        const stickerDefs = [
-            { id: 'tiger', name: '호랑이', type: 'drawTiger', meaning: '액운 퇴치, 늠름함' },
-            { id: 'magpie', name: '까치', type: 'drawMagpie', meaning: '기쁜 소식' },
-            { id: 'pine', name: '소나무', type: 'drawPine', meaning: '장수, 절개' },
-            { id: 'book', name: '책 stack', type: 'drawBook', meaning: '지혜, 학업 성취' },
-            { id: 'peony', name: '모란꽃', type: 'drawPeony', meaning: '부귀, 행복' },
-            { id: 'carp', name: '잉어', type: 'drawCarp', meaning: '효도, 등용문' },
-            { id: 'sun', name: '해', type: 'drawSun', meaning: '새 출발, 밝은 미래' },
-            { id: 'peach', name: '복숭아', type: 'drawPeach', meaning: '무병장수' }
+        // Tab 2: Available Stickers for Canvas
+        const stickerItems = [
+            { id: 'tiger', name: '호랑이', icon: '🐯', category: 'blessing', meaning: '액운 퇴치, 용맹함', wishKey: '액운' },
+            { id: 'magpie', name: '까치', icon: '🐦', category: 'blessing', meaning: '기쁜 소식', wishKey: '행운' },
+            { id: 'books', name: '책더미', icon: '📚', category: 'study', meaning: '학업 성취, 지혜', wishKey: '시험' },
+            { id: 'brush', name: '붓과 벼루', icon: '🖌️', category: 'study', meaning: '과거 합격, 출세', wishKey: '공부' },
+            { id: 'sun', name: '해', icon: '☀️', category: 'blessing', meaning: '밝은 희망, 생명력', wishKey: '희망' },
+            { id: 'turtle', name: '거북이', icon: '🐢', category: 'study', meaning: '무병장수, 건강', wishKey: '건강' },
+            { id: 'flower', name: '모란꽃', icon: '🌺', category: 'blessing', meaning: '부귀영화, 행복', wishKey: '부자' },
+            { id: 'peach', name: '천도복숭아', icon: '🍑', category: 'study', meaning: '장수와 행운', wishKey: '장수' },
+            { id: 'pouch', name: '복주머니', icon: '🧧', category: 'blessing', meaning: '복과 재물', wishKey: '복' },
+            { id: 'bamboo', name: '대나무', icon: '🎋', category: 'study', meaning: '지조와 성장', wishKey: '성장' },
+            { id: 'carp', name: '잉어', icon: '🐟', category: 'blessing', meaning: '효도와 등용문', wishKey: '효도' },
+            { id: 'deer', name: '사슴', icon: '🦌', category: 'study', meaning: '평화와 장수', wishKey: '평화' }
         ];
 
-        let currentArtworkIndex = 0;
-        let score = 0;
-        let canvasElements = [];
-        let canvasBgColor = '#f4efe6';
+        /* ==========================================================================
+           2. STATE MANAGEMENT
+           ========================================================================== */
+        let state = {
+            currentTab: 'tab1',
+            userPoints: 0,
+            selectedMinhwaIdx: 0,
+            exploredHotspots: new Set(),
+            quizSolved: [false, false, false, false],
+            
+            // Tab 2 Canvas State
+            canvasBg: '#F9F6ED',
+            canvasElements: [], // Array of objects placed on canvas
+            selectedElementIndex: -1,
+            isDragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0
+        };
 
-        // 탭 전환
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        /* ==========================================================================
+           3. INITIALIZATION & TAB SWITCHING
+           ========================================================================== */
+        window.onload = function() {
+            renderMinhwaExploration(0);
+            renderStickerGrid('all');
+            initCanvas();
+        };
 
-            if (tabName === 'study') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('studyTab').classList.add('active');
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            const tab1 = document.getElementById('tab1');
+            const tab2 = document.getElementById('tab2');
+            const tab1Btn = document.getElementById('tab1Btn');
+            const tab2Btn = document.getElementById('tab2Btn');
+
+            if (tabId === 'tab1') {
+                tab1.classList.remove('hidden');
+                tab2.classList.add('hidden');
+                tab1Btn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-traditionalYellow text-amber-950 shadow";
+                tab2Btn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-amber-200 hover:text-white";
             } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('studioTab').classList.add('active');
-                renderCanvas();
+                tab1.classList.add('hidden');
+                tab2.classList.remove('hidden');
+                tab2Btn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-traditionalYellow text-amber-950 shadow";
+                tab1Btn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-amber-200 hover:text-white";
+                drawCanvas();
             }
         }
 
-        // 민화 학습 탭 초기화
-        function initStudyTab() {
-            const listEl = document.getElementById('artworkList');
-            listEl.innerHTML = '';
-
-            artworks.forEach((art, idx) => {
-                const card = document.createElement('div');
-                card.className = `artwork-card ${idx === 0 ? 'active' : ''}`;
-                card.onclick = () => selectArtwork(idx);
-                card.innerHTML = `
-                    <img src="${art.image}" alt="${art.title}">
-                    <div class="artwork-card-info">
-                        <h3>${art.title}</h3>
-                        <p>${art.period}</p>
-                    </div>
-                `;
-                listEl.appendChild(card);
-            });
-
-            selectArtwork(0);
+        function addPoints(pts) {
+            state.userPoints += pts;
+            document.getElementById('userPoints').innerText = state.userPoints;
+            
+            // Confetti Blast Effect
+            if (window.confetti) {
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.2 }
+                });
+            }
         }
 
-        function selectArtwork(index) {
-            currentArtworkIndex = index;
-            const art = artworks[index];
-
-            document.querySelectorAll('.artwork-card').forEach((card, idx) => {
-                card.classList.toggle('active', idx === index);
+        /* ==========================================================================
+           4. TAB 1: MINHWA EXPLORATION & QUIZ LOGIC
+           ========================================================================== */
+        function selectMinhwa(index) {
+            state.selectedMinhwaIdx = index;
+            
+            // Update Card Styles
+            const cards = document.querySelectorAll('.minhwa-select-btn');
+            cards.forEach((card, idx) => {
+                if (idx === index) {
+                    card.classList.add('border-traditionalYellow');
+                    card.classList.remove('border-transparent');
+                } else {
+                    card.classList.remove('border-traditionalYellow');
+                    card.classList.add('border-transparent');
+                }
             });
 
-            document.getElementById('artworkTitle').innerText = `${art.title} (${art.period})`;
-            document.getElementById('mainImage').src = art.image;
-            document.getElementById('infoBox').innerHTML = `👉 <strong>${art.title}</strong>: ${art.description}<br><span style="color:#888;">(그림 위 동그라미 번호를 눌러 사물의 의미를 확인하세요)</span>`;
+            renderMinhwaExploration(index);
+        }
 
-            // Hotspots render
+        function renderMinhwaExploration(index) {
+            const data = minhwaData[index];
+
+            // Render SVG Illustration
+            const svgEl = document.getElementById('minhwaSvg');
+            svgEl.innerHTML = data.renderSvg();
+
+            // Render Hotspots
             const container = document.getElementById('hotspotContainer');
             container.innerHTML = '';
-            art.hotspots.forEach(hs => {
-                const spot = document.createElement('div');
-                spot.className = 'hotspot';
-                spot.style.left = hs.x + '%';
-                spot.style.top = hs.y + '%';
-                spot.innerText = hs.num;
-                spot.onclick = () => {
-                    document.getElementById('infoBox').innerHTML = `
-                        <h4 style="color:var(--primary); margin-bottom:4px;">🔍 ${hs.num}번. ${hs.name}</h4>
-                        <p style="font-size:0.95rem;">${hs.meaning}</p>
-                    `;
-                };
-                container.appendChild(spot);
-            });
-
-            // Quiz render
-            document.getElementById('quizQuestion').innerText = `❓ ${art.quiz.question}`;
-            const quizOpts = document.getElementById('quizOptions');
-            quizOpts.innerHTML = '';
-            art.quiz.options.forEach(opt => {
+            
+            data.hotspots.forEach(hs => {
                 const btn = document.createElement('button');
-                btn.className = 'quiz-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => checkQuiz(opt.correct);
-                quizOpts.appendChild(btn);
+                btn.className = `absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-traditionalRed/80 hover:bg-traditionalRed text-white font-bold flex items-center justify-center shadow-lg hotspot-pulse border-2 border-white transition-transform hover:scale-125`;
+                btn.style.left = `${(hs.cx / 400) * 100}%`;
+                btn.style.top = `${(hs.cy / 533) * 100}%`;
+                btn.innerHTML = `<span class="text-lg">${hs.icon}</span>`;
+                
+                // Hover & Touch Events
+                btn.onmouseenter = () => showObjectInfo(hs);
+                btn.onclick = () => {
+                    showObjectInfo(hs);
+                    markHotspotDiscovered(data.id, hs.id);
+                };
+                
+                container.appendChild(btn);
+            });
+
+            // Update Progress Text
+            updateProgressText(data);
+
+            // Reset Info Card
+            document.getElementById('objIcon').innerText = '🔍';
+            document.getElementById('objTitle').innerText = data.title;
+            document.getElementById('objSubtitle').innerText = data.subtitle;
+            document.getElementById('objDesc').innerText = data.desc;
+
+            // Render Quiz
+            renderQuiz(data);
+        }
+
+        function showObjectInfo(hs) {
+            document.getElementById('objIcon').innerText = hs.icon;
+            document.getElementById('objTitle').innerText = hs.title;
+            document.getElementById('objSubtitle').innerText = `${hs.name}의 상징적 의미`;
+            document.getElementById('objDesc').innerText = hs.desc;
+        }
+
+        function markHotspotDiscovered(minhwaId, hsId) {
+            const key = `${minhwaId}_${hsId}`;
+            if (!state.exploredHotspots.has(key)) {
+                state.exploredHotspots.add(key);
+                addPoints(10); // Reward for finding hotspot
+                updateProgressText(minhwaData[state.selectedMinhwaIdx]);
+            }
+        }
+
+        function updateProgressText(data) {
+            const total = data.hotspots.length;
+            let found = 0;
+            data.hotspots.forEach(hs => {
+                if (state.exploredHotspots.has(`${data.id}_${hs.id}`)) found++;
+            });
+            document.getElementById('explorationProgress').innerText = `발견: ${found}/${total}`;
+        }
+
+        function renderQuiz(data) {
+            document.getElementById('quizQuestion').innerText = data.quiz.question;
+            const optionsContainer = document.getElementById('quizOptions');
+            const feedbackEl = document.getElementById('quizFeedback');
+            feedbackEl.classList.add('hidden');
+
+            optionsContainer.innerHTML = '';
+
+            const isSolved = state.quizSolved[state.selectedMinhwaIdx];
+
+            data.quiz.options.forEach((opt, oIdx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-3 rounded-xl border text-xs font-medium transition-all ${
+                    isSolved && opt.isCorrect 
+                        ? 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold' 
+                        : 'bg-white hover:bg-amber-50 border-amber-200 text-slate-800'
+                }`;
+                btn.innerText = `${oIdx + 1}. ${opt.text}`;
+                btn.disabled = isSolved;
+
+                btn.onclick = () => checkQuizAnswer(opt.isCorrect, data.quiz.explanation, btn);
+                optionsContainer.appendChild(btn);
             });
         }
 
-        function checkQuiz(isCorrect) {
+        function checkQuizAnswer(isCorrect, explanation, clickedBtn) {
+            const feedbackEl = document.getElementById('quizFeedback');
+            feedbackEl.classList.remove('hidden');
+
             if (isCorrect) {
-                score += 50;
-                document.getElementById('scoreText').innerText = score;
-                alert('🎉 정답입니다! 조선 시대 서민들의 마음을 잘 이해하셨네요! (+50점 획득)');
-            } else {
-                alert('💡 다시 한번 생각해보세요! 사물들의 의미(호랑이, 까치, 책 등)를 살펴보면 힌트를 얻을 수 있습니다.');
-            }
-        }
-
-        // Canvas & Studio 관련
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function initStudioTab() {
-            renderStickerPalette();
-            renderCanvas();
-        }
-
-        // 개별 사물 아이콘 그리기 함수들 (Canvas Vector Data)
-        function drawIcon(type, targetCtx, w, h) {
-            targetCtx.clearRect(0, 0, w, h);
-            targetCtx.save();
-
-            if(type === 'drawTiger') {
-                // 호랑이 얼굴
-                targetCtx.fillStyle = '#e69500';
-                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 18, 0, Math.PI*2); targetCtx.fill();
-                // 귀
-                targetCtx.beginPath(); targetCtx.arc(w/2-14, h/2-14, 6, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2+14, h/2-14, 6, 0, Math.PI*2); targetCtx.fill();
-                // 줄무늬
-                targetCtx.strokeStyle = '#000'; targetCtx.lineWidth = 2;
-                targetCtx.beginPath(); targetCtx.moveTo(w/2-8, h/2-10); targetCtx.lineTo(w/2+8, h/2-10); targetCtx.stroke();
-                targetCtx.beginPath(); targetCtx.moveTo(w/2-12, h/2); targetCtx.lineTo(w/2-4, h/2); targetCtx.stroke();
-                targetCtx.beginPath(); targetCtx.moveTo(w/2+4, h/2); targetCtx.lineTo(w/2+12, h/2); targetCtx.stroke();
-                // 눈
-                targetCtx.fillStyle = '#fff';
-                targetCtx.beginPath(); targetCtx.arc(w/2-6, h/2-4, 4, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2+6, h/2-4, 4, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.fillStyle = '#000';
-                targetCtx.beginPath(); targetCtx.arc(w/2-6, h/2-4, 2, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2+6, h/2-4, 2, 0, Math.PI*2); targetCtx.fill();
-            } else if(type === 'drawMagpie') {
-                // 까치
-                targetCtx.fillStyle = '#222';
-                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2+2, 16, 10, Math.PI/4, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.fillStyle = '#fff';
-                targetCtx.beginPath(); targetCtx.arc(w/2-4, h/2, 6, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.fillStyle = '#d4a359';
-                targetCtx.beginPath(); targetCtx.moveTo(w/2-14, h/2-2); targetCtx.lineTo(w/2-22, h/2); targetCtx.lineTo(w/2-14, h/2+4); targetCtx.fill();
-            } else if(type === 'drawPine') {
-                // 소나무
-                targetCtx.fillStyle = '#5c4033';
-                targetCtx.fillRect(w/2-3, h/2, 6, 18);
-                targetCtx.fillStyle = '#2e5a44';
-                targetCtx.beginPath(); targetCtx.arc(w/2, h/2-6, 16, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2-10, h/2+2, 12, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2+10, h/2+2, 12, 0, Math.PI*2); targetCtx.fill();
-            } else if(type === 'drawBook') {
-                // 책
-                targetCtx.fillStyle = '#1f4e79';
-                targetCtx.fillRect(w/2-16, h/2-12, 32, 22);
-                targetCtx.fillStyle = '#fff';
-                targetCtx.fillRect(w/2-14, h/2-10, 28, 18);
-                targetCtx.fillStyle = '#b83b5e';
-                targetCtx.fillRect(w/2-12, h/2-8, 24, 14);
-            } else if(type === 'drawPeony') {
-                // 모란꽃
-                targetCtx.fillStyle = '#c0392b';
-                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 15, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.fillStyle = '#e74c3c';
-                for(let i=0; i<5; i++) {
-                    let ang = (i*72) * Math.PI/180;
-                    targetCtx.beginPath(); targetCtx.arc(w/2 + Math.cos(ang)*8, h/2 + Math.sin(ang)*8, 8, 0, Math.PI*2); targetCtx.fill();
+                feedbackEl.className = 'mt-3 p-3 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-800 border border-emerald-300';
+                feedbackEl.innerHTML = `🎉 정답입니다! <br><span class="font-normal">${explanation}</span>`;
+                
+                if (!state.quizSolved[state.selectedMinhwaIdx]) {
+                    state.quizSolved[state.selectedMinhwaIdx] = true;
+                    addPoints(50);
+                    
+                    // Show Completed Badge on Top Selection Card
+                    const badges = document.querySelectorAll('.status-badge');
+                    if (badges[state.selectedMinhwaIdx]) {
+                        badges[state.selectedMinhwaIdx].classList.remove('hidden');
+                    }
                 }
-                targetCtx.fillStyle = '#f1c40f';
-                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 5, 0, Math.PI*2); targetCtx.fill();
-            } else if(type === 'drawCarp') {
-                // 잉어
-                targetCtx.fillStyle = '#d35400';
-                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2, 18, 10, 0, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.moveTo(w/2+14, h/2); targetCtx.lineTo(w/2+24, h/2-8); targetCtx.lineTo(w/2+24, h/2+8); targetCtx.fill();
-            } else if(type === 'drawSun') {
-                // 해
-                targetCtx.fillStyle = '#c0392b';
-                targetCtx.beginPath(); targetCtx.arc(w/2, h/2, 16, 0, Math.PI*2); targetCtx.fill();
-            } else if(type === 'drawPeach') {
-                // 복숭아
-                targetCtx.fillStyle = '#ff7675';
-                targetCtx.beginPath(); targetCtx.arc(w/2-5, h/2, 12, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(w/2+5, h/2, 12, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.moveTo(w/2, h/2-16); targetCtx.lineTo(w/2-10, h/2+8); targetCtx.lineTo(w/2+10, h/2+8); targetCtx.fill();
-                targetCtx.fillStyle = '#27ae60';
-                targetCtx.beginPath(); targetCtx.ellipse(w/2, h/2-14, 8, 3, Math.PI/4, 0, Math.PI*2); targetCtx.fill();
+            } else {
+                feedbackEl.className = 'mt-3 p-3 rounded-xl text-xs font-bold text-center bg-rose-100 text-rose-800 border border-rose-300';
+                feedbackEl.innerHTML = `❌ 다시 생각해보세요! 힌트: 민화 속 사물의 의미를 확인해보세요.`;
+            }
+        }
+
+        /* ==========================================================================
+           5. TAB 2: CANVAS & CREATIVE STUDIO LOGIC
+           ========================================================================== */
+        let canvas, ctx;
+
+        function initCanvas() {
+            canvas = document.getElementById('minhwaCanvas');
+            ctx = canvas.getContext('2d');
+
+            // Mouse & Touch Event Listeners for Dragging Elements
+            canvas.addEventListener('mousedown', handlePointerDown);
+            canvas.addEventListener('mousemove', handlePointerMove);
+            canvas.addEventListener('mouseup', handlePointerUp);
+
+            canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+            canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+            canvas.addEventListener('touchend', handlePointerUp);
+
+            drawCanvas();
+        }
+
+        function setCanvasBg(color, name) {
+            state.canvasBg = color;
+            drawCanvas();
+        }
+
+        function renderStickerGrid(category) {
+            const grid = document.getElementById('stickerGrid');
+            grid.innerHTML = '';
+
+            const filtered = category === 'all' 
+                ? stickerItems 
+                : stickerItems.filter(s => s.category === category);
+
+            filtered.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'p-2 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-200 flex flex-col items-center justify-center transition hover:scale-105';
+                btn.innerHTML = `
+                    <span class="text-2xl">${item.icon}</span>
+                    <span class="text-[10px] font-bold text-amber-950 mt-1">${item.name}</span>
+                    <span class="text-[9px] text-amber-700">${item.meaning}</span>
+                `;
+                btn.onclick = () => addStickerToCanvas(item);
+                grid.appendChild(btn);
+            });
+        }
+
+        function filterStickers(cat) {
+            // Update Active Category Style
+            const btns = document.querySelectorAll('.sticker-cat-btn');
+            btns.forEach(b => {
+                b.className = 'sticker-cat-btn py-1 text-xs rounded bg-amber-100 text-amber-900 font-medium';
+            });
+            event.target.className = 'sticker-cat-btn py-1 text-xs rounded bg-amber-900 text-white font-medium';
+            
+            renderStickerGrid(cat);
+        }
+
+        function analyzeWish() {
+            const wishText = document.getElementById('wishInput').value.trim();
+            if (!wishText) return;
+
+            const recBox = document.getElementById('recommendResult');
+            const recText = document.getElementById('recommendText');
+            recBox.classList.remove('hidden');
+
+            let matched = [];
+            stickerItems.forEach(item => {
+                if (wishText.includes(item.wishKey) || wishText.includes(item.name) || wishText.includes(item.meaning)) {
+                    matched.push(item);
+                }
+            });
+
+            if (matched.length === 0) {
+                // Default fallback recommendations
+                matched = [stickerItems[0], stickerItems[1], stickerItems[4]];
             }
 
-            targetCtx.restore();
+            recText.innerHTML = matched.map(m => `<strong>[${m.icon} ${m.name}]</strong>`).join(' ');
         }
 
-        function renderStickerPalette() {
-            const palette = document.getElementById('stickerPalette');
-            palette.innerHTML = '';
-
-            stickerDefs.forEach(s => {
-                const item = document.createElement('div');
-                item.className = 'sticker-item';
-                item.onclick = () => addStickerToCanvas(s.type, s.name);
-
-                const c = document.createElement('canvas');
-                c.width = 50; c.height = 50;
-                const cCtx = c.getContext('2d');
-                drawIcon(s.type, cCtx, 50, 50);
-
-                item.appendChild(c);
-                const span = document.createElement('span');
-                span.innerText = `${s.name}
-(${s.meaning})`;
-                item.appendChild(span);
-
-                palette.appendChild(item);
-            });
+        function setWishTag(text) {
+            document.getElementById('wishInput').value = text;
+            analyzeWish();
         }
 
-        function changeBgColor() {
-            canvasBgColor = document.getElementById('bgColorSelect').value;
-            renderCanvas();
-        }
-
-        function addStickerToCanvas(type, name) {
-            canvasElements.push({
-                kind: 'sticker',
-                type: type,
-                name: name,
-                x: 300 + (Math.random()*40 - 20),
-                y: 350 + (Math.random()*40 - 20),
-                size: 80
-            });
-            renderCanvas();
+        /* Canvas Element Manipulation Functions */
+        function addStickerToCanvas(item) {
+            const newElem = {
+                type: 'sticker',
+                content: item.icon,
+                label: item.name,
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                scale: 1.0,
+                rotate: 0,
+                fontSize: 48
+            };
+            state.canvasElements.push(newElem);
+            state.selectedElementIndex = state.canvasElements.length - 1;
+            updateControlPanel();
+            drawCanvas();
         }
 
         function addTextToCanvas() {
-            const val = document.getElementById('canvasText').value;
-            if(!val.trim()) return;
-            canvasElements.push({
-                kind: 'text',
-                text: val,
-                x: 300,
-                y: 120,
-                fontSize: 26
-            });
-            renderCanvas();
+            const input = document.getElementById('canvasTextInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const newElem = {
+                type: 'text',
+                content: text,
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                scale: 1.0,
+                rotate: 0,
+                fontSize: 28
+            };
+            state.canvasElements.push(newElem);
+            state.selectedElementIndex = state.canvasElements.length - 1;
+            input.value = '';
+            updateControlPanel();
+            drawCanvas();
         }
 
-        function recommendObjects() {
-            const wish = document.getElementById('wishInput').value;
-            if(!wish) {
-                alert('소망을 입력해 보세요!');
-                return;
-            }
-
-            let rec = [];
-            if(wish.includes('시험') || wish.includes('공부') || wish.includes('성적') || wish.includes('책')) {
-                rec = ['drawBook', 'drawCarp'];
-                alert('💡 [학업 성취 & 출세] 소망에 어울리는 "책"과 "잉어"를 추천합니다!');
-            } else if(wish.includes('건강') || wish.includes(' 오래') || wish.includes('아프지')) {
-                rec = ['drawPine', 'drawPeach'];
-                alert('💡 [장수 & 무병장수] 소망에 어울리는 "소망 소나무"와 "복숭아"를 추천합니다!');
-            } else if(wish.includes('행복') || wish.includes('친구') || wish.includes('가족') || wish.includes('화목')) {
-                rec = ['drawMagpie', 'drawPeony'];
-                alert('💡 [기쁨 & 화목] 소망에 어울리는 "까치"와 "모란꽃"을 추천합니다!');
-            } else {
-                rec = ['drawTiger', 'drawSun'];
-                alert('💡 [액운 퇴치 & 밝은 미래] 소망에 어울리는 "호랑이"와 "해"를 추천합니다!');
-            }
-
-            rec.forEach(rType => {
-                const def = stickerDefs.find(s => s.type === rType);
-                addStickerToCanvas(rType, def ? def.name : '사물');
-            });
+        function addStampToCanvas() {
+            const newElem = {
+                type: 'stamp',
+                content: '福',
+                x: canvas.width - 50,
+                y: canvas.height - 50,
+                scale: 1.0,
+                rotate: 0,
+                fontSize: 24
+            };
+            state.canvasElements.push(newElem);
+            state.selectedElementIndex = state.canvasElements.length - 1;
+            updateControlPanel();
+            drawCanvas();
         }
 
-        function clearCanvas() {
-            canvasElements = [];
-            renderCanvas();
-        }
+        function drawCanvas() {
+            if (!ctx) return;
 
-        function renderCanvas() {
-            // 배경
-            ctx.fillStyle = canvasBgColor;
+            // Fill Background
+            ctx.fillStyle = state.canvasBg;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 전통 족자 문양 틀
-            ctx.strokeStyle = '#7d1c1c';
-            ctx.lineWidth = 6;
-            ctx.strokeRect(15, 15, canvas.width-30, canvas.height-30);
-            ctx.strokeStyle = '#d4a359';
+            // Draw Subtle Traditional Border Pattern inside Canvas
+            ctx.strokeStyle = '#D4AF37';
             ctx.lineWidth = 2;
-            ctx.strokeRect(22, 22, canvas.width-44, canvas.height-44);
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
 
-            // 요소들 그리기
-            canvasElements.forEach(el => {
-                if(el.kind === 'sticker') {
-                    ctx.save();
-                    ctx.translate(el.x, el.y);
-                    drawIcon(el.type, ctx, el.size, el.size);
-                    ctx.restore();
-                } else if(el.kind === 'text') {
-                    ctx.save();
-                    ctx.font = 'bold ' + el.fontSize + 'px "궁서", "Gungsuh", serif';
-                    ctx.fillStyle = '#7d1c1c';
+            // Render all elements
+            state.canvasElements.forEach((elem, idx) => {
+                ctx.save();
+                ctx.translate(elem.x, elem.y);
+                ctx.rotate((elem.rotate * Math.PI) / 180);
+                ctx.scale(elem.scale, elem.scale);
+
+                if (elem.type === 'sticker') {
+                    ctx.font = `${elem.fontSize}px sans-serif`;
                     ctx.textAlign = 'center';
-                    ctx.fillText(el.text, el.x, el.y);
-
-                    // 낙관 도장 느낌 효과
-                    ctx.fillStyle = '#c0392b';
-                    ctx.fillRect(el.x + (el.text.length*10) + 10, el.y - 20, 22, 22);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '10px sans-serif';
-                    ctx.fillText('인', el.x + (el.text.length*10) + 21, el.y - 5);
-                    ctx.restore();
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(elem.content, 0, 0);
+                } else if (elem.type === 'text') {
+                    ctx.font = `bold ${elem.fontSize}px 'Gowun Batang', serif`;
+                    ctx.fillStyle = '#222222';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(elem.content, 0, 0);
+                } else if (elem.type === 'stamp') {
+                    // Red Stamp Square
+                    ctx.fillStyle = '#C83232';
+                    ctx.fillRect(-20, -20, 40, 40);
+                    ctx.strokeStyle = '#FFF';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(-18, -18, 36, 36);
+                    ctx.font = `bold 22px 'Gowun Batang', serif`;
+                    ctx.fillStyle = '#FFF';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(elem.content, 0, 0);
                 }
+
+                // Highlight Selection Border
+                if (idx === state.selectedElementIndex) {
+                    ctx.strokeStyle = '#C83232';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeRect(-30, -30, 60, 60);
+                }
+
+                ctx.restore();
             });
         }
 
-        // 캔버스 드래그 이동
-        let isDragging = false;
-        let selectedEl = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-
-        canvas.addEventListener('mousedown', (e) => {
+        /* Pointer Input Helpers */
+        function getPointerPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
 
-            // 역순 검사 (위에 그려진 것 우선)
-            for(let i = canvasElements.length - 1; i >= 0; i--) {
-                const el = canvasElements[i];
-                if(el.kind === 'sticker') {
-                    if(mouseX >= el.x && mouseX <= el.x + el.size && mouseY >= el.y && mouseY <= el.y + el.size) {
-                        isDragging = true;
-                        selectedEl = el;
-                        dragOffsetX = mouseX - el.x;
-                        dragOffsetY = mouseY - el.y;
-                        return;
-                    }
-                } else if(el.kind === 'text') {
-                    if(Math.abs(mouseX - el.x) < 100 && Math.abs(mouseY - el.y) < 20) {
-                        isDragging = true;
-                        selectedEl = el;
-                        dragOffsetX = mouseX - el.x;
-                        dragOffsetY = mouseY - el.y;
-                        return;
-                    }
+        function handlePointerDown(e) {
+            const pos = getPointerPos(e);
+            
+            // Check top-most element collision (reverse loop)
+            let found = -1;
+            for (let i = state.canvasElements.length - 1; i >= 0; i--) {
+                const el = state.canvasElements[i];
+                const dx = pos.x - el.x;
+                const dy = pos.y - el.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 35 * el.scale) {
+                    found = i;
+                    state.dragOffsetX = dx;
+                    state.dragOffsetY = dy;
+                    break;
                 }
             }
-        });
 
-        canvas.addEventListener('mousemove', (e) => {
-            if(!isDragging || !selectedEl) return;
-            const rect = canvas.getBoundingClientRect();
-            selectedEl.x = (e.clientX - rect.left) - dragOffsetX;
-            selectedEl.y = (e.clientY - rect.top) - dragOffsetY;
-            renderCanvas();
-        });
+            state.selectedElementIndex = found;
+            if (found !== -1) {
+                state.isDragging = true;
+            }
 
-        canvas.addEventListener('mouseup', () => {
-            isDragging = false;
-            selectedEl = null;
-        });
+            updateControlPanel();
+            drawCanvas();
+        }
 
-        function downloadCanvas() {
+        function handlePointerMove(e) {
+            if (!state.isDragging || state.selectedElementIndex === -1) return;
+            e.preventDefault();
+            const pos = getPointerPos(e);
+            const el = state.canvasElements[state.selectedElementIndex];
+            el.x = pos.x - state.dragOffsetX;
+            el.y = pos.y - state.dragOffsetY;
+            drawCanvas();
+        }
+
+        function handlePointerUp() {
+            state.isDragging = false;
+        }
+
+        function updateControlPanel() {
+            const panel = document.getElementById('elementControlPanel');
+            if (state.selectedElementIndex !== -1) {
+                panel.classList.remove('hidden');
+                const el = state.canvasElements[state.selectedElementIndex];
+                document.getElementById('scaleSlider').value = el.scale;
+                document.getElementById('rotateSlider').value = el.rotate;
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function updateSelectedScale(val) {
+            if (state.selectedElementIndex !== -1) {
+                state.canvasElements[state.selectedElementIndex].scale = parseFloat(val);
+                drawCanvas();
+            }
+        }
+
+        function updateSelectedRotate(val) {
+            if (state.selectedElementIndex !== -1) {
+                state.canvasElements[state.selectedElementIndex].rotate = parseInt(val);
+                drawCanvas();
+            }
+        }
+
+        function deleteSelectedElement() {
+            if (state.selectedElementIndex !== -1) {
+                state.canvasElements.splice(state.selectedElementIndex, 1);
+                state.selectedElementIndex = -1;
+                updateControlPanel();
+                drawCanvas();
+            }
+        }
+
+        function clearCanvasElements() {
+            state.canvasElements = [];
+            state.selectedElementIndex = -1;
+            updateControlPanel();
+            drawCanvas();
+        }
+
+        function downloadMinhwa() {
+            // Deselect element to remove bounding boxes before saving
+            const tempSelected = state.selectedElementIndex;
+            state.selectedElementIndex = -1;
+            drawCanvas();
+
+            // Create Downloadable Link
             const link = document.createElement('a');
             link.download = '나만의_소망_민화.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
-        }
 
-        // 초기화 호출
-        window.onload = () => {
-            initStudyTab();
-            initStudioTab();
-        };
+            // Restore Selection
+            state.selectedElementIndex = tempSelected;
+            drawCanvas();
+        }
     </script>
 </body>
 </html>
