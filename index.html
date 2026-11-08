@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>민화 탐험대</title>
+  <style>
+    :root {
+      --ink: #342b27;
+      --paper: #fffaf0;
+      --coral: #e88968;
+      --green: #728a64;
+      --gold: #e2b655;
+      --shadow: 0 12px 32px #49372118;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #f5efe2;
+      font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px max(20px, calc((100% - 1120px) / 2));
+      background: #fffaf0;
+      border-bottom: 1px solid #e9dfcb;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.25rem; }
+    .brand-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 14px; background: #f4d98f; }
+    .points { padding: 9px 14px; border-radius: 99px; background: #f7e7b8; font-weight: 800; white-space: nowrap; }
+
+    main { max-width: 1120px; margin: auto; padding: 28px 20px 60px; }
+    .intro { margin-bottom: 22px; }
+    .intro h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.4rem); }
+    .intro p { margin: 0; color: #71665b; line-height: 1.65; }
+
+    .tabs { display: flex; gap: 8px; margin: 22px 0; }
+    .tab {
+      padding: 11px 18px; border: 0; border-radius: 12px;
+      color: #65584b; background: #eae2d4; font-weight: 800;
+    }
+    .tab.active { color: white; background: #586e51; }
+
+    .panel {
+      background: var(--paper); border: 1px solid #eee4d2;
+      border-radius: 22px; padding: 22px; box-shadow: var(--shadow);
+    }
+
+    .study-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr); gap: 22px; }
+    .art-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .art-heading h2 { margin: 0 0 5px; font-size: 1.35rem; }
+    .art-heading p { margin: 0; color: #756a5e; font-size: .92rem; }
+    .badge { padding: 6px 10px; border-radius: 99px; background: #f3e7c7; color: #6a5836; font-size: .82rem; font-weight: 800; white-space: nowrap; }
+
+    .artwork, .creator-board {
+      position: relative; overflow: hidden; min-height: 340px; border: 8px solid #d5b875;
+      border-radius: 15px; background: #f0dfb8;
+      box-shadow: inset 0 0 0 2px #fff9e9, 0 7px 15px #52391b20;
+    }
+    .artwork::before, .creator-board::before {
+      content: ""; position: absolute; inset: 12px; border: 1px solid #ffffff88;
+      border-radius: 8px; pointer-events: none;
+    }
+    .artwork .item, .creator-board .item {
+      position: absolute; z-index: 1; display: grid; place-items: center;
+      width: 72px; height: 72px; transform: translate(-50%, -50%);
+      border-radius: 50%; font-size: 48px; user-select: none;
+    }
+    .artwork .item { cursor: help; transition: transform .18s ease, filter .18s ease; }
+    .artwork .item:hover, .artwork .item:focus { transform: translate(-50%, -50%) scale(1.2); filter: drop-shadow(0 5px 5px #44321a55); outline: none; }
+    .artwork .item::after {
+      content: attr(data-label); position: absolute; top: 72px; left: 50%;
+      transform: translateX(-50%); padding: 4px 8px; border-radius: 99px;
+      background: #fffaf0e8; color: #514638; font-size: 12px; font-weight: 800;
+      white-space: nowrap; opacity: 0; transition: opacity .15s;
+    }
+    .artwork .item:hover::after, .artwork .item:focus::after { opacity: 1; }
+    .scene-sun { position: absolute; top: 8%; right: 12%; font-size: 46px; opacity: .8; pointer-events: none; }
+    .scene-hill { position: absolute; bottom: -34%; width: 70%; height: 65%; border-radius: 50%; background: #70876866; }
+    .scene-hill.one { left: -12%; }
+    .scene-hill.two { right: -15%; bottom: -42%; background: #b3835b55; }
+
+    .hover-hint { margin: 10px 0 0; color: #807567; font-size: .88rem; }
+    .meaning-box { min-height: 90px; margin-top: 12px; padding: 14px; border-radius: 14px; background: #f4edde; line-height: 1.6; }
+    .meaning-box strong { color: #526b4c; }
+    .side-card { padding: 18px; border-radius: 16px; background: #f7f1e5; }
+    .side-card + .side-card { margin-top: 14px; }
+    .side-card h3 { margin: 0 0 10px; font-size: 1.05rem; }
+    .side-card p { margin: 0; color: #6d6258; line-height: 1.6; }
+    .art-nav { display: flex; gap: 8px; margin-top: 16px; }
+    .art-nav button, .action {
+      border: 0; border-radius: 11px; padding: 10px 14px;
+      background: #e8dfd0; color: #4a4036; font-weight: 800;
+    }
+    .art-nav button:hover, .action:hover { filter: brightness(.97); }
+    .action.primary { color: white; background: #586e51; }
+    .action.coral { color: white; background: #d7785d; }
+    .art-nav .spacer { flex: 1; }
+
+    .quiz-options { display: grid; gap: 8px; margin-top: 12px; }
+    .quiz-option {
+      padding: 11px 12px; text-align: left; border: 2px solid #e8dfd0;
+      border-radius: 11px; background: #fffaf0; color: var(--ink); font-weight: 700;
+    }
+    .quiz-option:hover { border-color: #9baa8f; }
+    .quiz-option.correct { border-color: #66835e; background: #e9f1e4; }
+    .quiz-option.wrong { border-color: #d77b68; background: #fbe9e3; }
+    .quiz-result { min-height: 24px; margin-top: 10px; font-weight: 800; }
+    .small-note { margin-top: 8px !important; font-size: .82rem; }
+
+    .creator-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .8fr); gap: 22px; }
+    .creator-board {
+      min-height: 430px; background: #f0dfb8; touch-action: none;
+    }
+    .creator-board .item { cursor: grab; touch-action: none; }
+    .creator-board .item:active { cursor: grabbing; }
+    .creator-board .item.selected { outline: 3px dashed #d7785d; outline-offset: 3px; }
+    .creator-board .item .remove {
+      position: absolute; top: -4px; right: -5px; display: none; place-items: center;
+      width: 23px; height: 23px; padding: 0; border: 0; border-radius: 50%;
+      color: white; background: #bd5d4d; font-size: 14px;
+    }
+    .creator-board .item:hover .remove, .creator-board .item.selected .remove { display: grid; }
+    .controls { display: grid; gap: 15px; }
+    .control-group { padding: 16px; border-radius: 15px; background: #f7f1e5; }
+    .control-group h3 { margin: 0 0 10px; font-size: 1rem; }
+    .wish-row { display: flex; gap: 7px; }
+    .wish-row input { min-width: 0; flex: 1; padding: 10px; border: 1px solid #d8cbb7; border-radius: 10px; background: #fffaf0; }
+    .color-row, .mood-row, .object-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch { width: 38px; height: 38px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 1px #cfc2ae; }
+    .swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px #586e51; }
+    .mood-button, .object-button { border: 1px solid #ddd0bc; border-radius: 10px; padding: 8px 10px; background: #fffaf0; }
+    .mood-button[aria-pressed="true"] { border-color: #586e51; background: #e7eddf; }
+    .object-button { font-size: 1.35rem; }
+    .object-button span { display: block; font-size: .75rem; font-weight: 700; }
+    .tool-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .creator-status { min-height: 22px; margin: 8px 0 0; color: #586e51; font-size: .9rem; font-weight: 700; }
+    .footer-note { margin: 16px 2px 0; color: #81776a; font-size: .84rem; line-height: 1.55; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 760px) {
+      .study-layout, .creator-grid { grid-template-columns: 1fr; }
+      .artwork { min-height: 310px; }
+      .creator-board { min-height: 360px; }
+      .panel { padding: 16px; }
+      .topbar { padding: 14px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">🖼️</span> 민화 탐험대</div>
+    <div class="points" aria-live="polite">⭐ 내 점수 <span id="points">0</span>점</div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1>그림 속 소망을 찾아볼까?</h1>
+      <p>민화 속 사물에는 옛사람들의 바람이 담겨 있어요. 그림을 살펴보고, 숨은 뜻을 맞혀 보세요!</p>
+    </section>
+
+    <nav class="tabs" aria-label="학습 메뉴">
+      <button class="tab active" id="studyTab" type="button">🔎 민화 공부</button>
+      <button class="tab" id="createTab" type="button">🎨 나만의 민화</button>
+    </nav>
+
+    <section id="studyPanel" class="panel">
+      <div class="study-layout">
+        <div>
+          <div class="art-heading">
+            <div>
+              <h2 id="artTitle"></h2>
+              <p id="artSubtitle"></p>
+            </div>
+            <span class="badge" id="artGenre"></span>
+          </div>
+          <div class="artwork" id="artwork" aria-label="민화 그림">
+            <span class="scene-sun" aria-hidden="true">☀️</span>
+            <span class="scene-hill one" aria-hidden="true"></span>
+            <span class="scene-hill two" aria-hidden="true"></span>
+          </div>
+          <p class="hover-hint">💡 그림 속 사물에 마우스를 올리거나 눌러 뜻을 확인해 보세요.</p>
+          <div class="meaning-box" id="meaningBox" aria-live="polite">사물을 눌러 어떤 소망이 담겼는지 알아보세요.</div>
+          <div class="art-nav">
+            <button type="button" id="prevArt">← 이전 그림</button>
+            <span class="spacer"></span>
+            <span class="badge" id="artCount"></span>
+            <button type="button" id="nextArt">다음 그림 →</button>
+          </div>
+        </div>
+
+        <aside>
+          <div class="side-card">
+            <h3>🧩 그림의 뜻을 맞혀 봐!</h3>
+            <p>사물의 뜻을 살펴본 뒤, 이 그림에 담긴 소망을 골라 보세요. 정답을 맞히면 10점을 얻어요!</p>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult" aria-live="polite"></div>
+          </div>
+          <div class="side-card">
+            <h3>📚 민화 한 걸음</h3>
+            <p id="artFact"></p>
+            <p class="small-note">※ 민화의 상징은 그림과 시대에 따라 조금씩 달라질 수 있어요.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="creatorPanel" class="panel hidden">
+      <div class="art-heading">
+        <div>
+          <h2>나의 소망을 그림으로!</h2>
+          <p>소망을 적고 사물을 골라 보세요. 그림 속 사물은 마우스나 손가락으로 옮길 수 있어요.</p>
+        </div>
+        <span class="badge">나만의 작품</span>
+      </div>
+
+      <div class="creator-grid">
+        <div>
+          <div class="creator-board" id="creatorBoard" aria-label="나만의 민화 만들기 그림판">
+            <span class="scene-sun" aria-hidden="true">☀️</span>
+            <span class="scene-hill one" aria-hidden="true"></span>
+            <span class="scene-hill two" aria-hidden="true"></span>
+          </div>
+          <p class="footer-note">사물을 끌어서 원하는 곳에 놓아 보세요. 사물을 선택한 뒤 × 버튼을 누르면 지울 수 있어요.</p>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <h3>1. 이루고 싶은 소망</h3>
+            <div class="wish-row">
+              <input id="wishInput" type="text" placeholder="예: 건강하고 행복하게 살고 싶어요" maxlength="80">
+              <button class="action primary" id="wishButton" type="button">사물 추천</button>
+            </div>
+            <p class="creator-status" id="wishStatus" aria-live="polite"></p>
+          </div>
+
+          <div class="control-group">
+            <h3>2. 배경 색 고르기</h3>
+            <div class="color-row" id="colorOptions" aria-label="배경 색 선택"></div>
+          </div>
+
+          <div class="control-group">
+            <h3>3. 분위기 고르기</h3>
+            <div class="mood-row" id="moodOptions"></div>
+          </div>
+
+          <div class="control-group">
+            <h3>4. 그림에 사물 더하기</h3>
+            <div class="object-row" id="objectOptions"></div>
+          </div>
+
+          <div class="control-group">
+            <h3>작품 도구</h3>
+            <div class="tool-row">
+              <button class="action coral" id="clearBoard" type="button">모두 지우기</button>
+              <button class="action" id="saveImage" type="button">그림 저장하기</button>
+            </div>
+            <p class="footer-note">그림 저장은 현재 그림판을 이미지로 내려받는 기능이에요.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const artworks = [
+      {
+        title: "책거리",
+        subtitle: "책과 여러 물건을 그린 그림",
+        genre: "책거리",
+        fact: "책거리는 책과 문방구, 여러 물건을 함께 그린 민화예요. 공부를 잘하고 지혜롭기를 바라는 마음이 담기곤 했어요.",
+        background: "linear-gradient(145deg, #e8d1a2, #f8edcf 55%, #c3a576)",
+        objects: [
+          { emoji: "📚", label: "책", x: 25, y: 58, meaning: "책은 배움과 지혜를 뜻해요. 공부를 잘하고 훌륭한 사람이 되기를 바라는 마음을 담았어요." },
+          { emoji: "🖌️", label: "붓", x: 48, y: 39, meaning: "붓은 글공부와 과거 시험을 떠올리게 해요. 학문에 힘쓰기를 바라는 뜻이 담겼어요." },
+          { emoji: "🏺", label: "도자기", x: 70, y: 61, meaning: "도자기와 귀한 물건은 풍요롭고 넉넉한 삶을 바라는 마음을 나타내기도 해요." },
+          { emoji: "🍑", label: "복숭아", x: 78, y: 31, meaning: "복숭아는 오래 살기를 바라는 마음을 나타내는 상징으로 쓰였어요." }
+        ],
+        answer: "공부를 잘하고 지혜롭고 넉넉하게 살기를 바라는 마음",
+        choices: ["공부를 잘하고 지혜롭고 넉넉하게 살기를 바라는 마음", "먼 바다로 여행을 떠나고 싶은 마음", "비가 많이 내려 농사가 망하기를 바라는 마음"]
+      },
+      {
+        title: "호작도",
+        subtitle: "호랑이와 까치가 등장하는 그림",
+        genre: "호작도",
+        fact: "호랑이와 까치가 함께 그려진 그림을 호작도라고 불러요. 호랑이는 익살스럽게 그려지는 경우가 많고, 까치는 반가운 소식을 전하는 새로 여겨졌어요.",
+        background: "linear-gradient(145deg, #d9e3bf, #f3e7bc 55%, #c8a47a)",
+        objects: [
+          { emoji: "🐯", label: "호랑이", x: 34, y: 60, meaning: "호랑이는 무서운 기운을 막아 준다고 여겨졌어요. 민화 속에서는 익살스럽고 친근하게 그려지기도 해요." },
+          { emoji: "🐦", label: "까치", x: 69, y: 33, meaning: "까치는 반가운 소식을 전하는 새로 여겨졌어요. 좋은 소식이 오기를 바라는 마음을 담았어요." },
+          { emoji: "🌲", label: "소나무", x: 75, y: 65, meaning: "소나무는 겨울에도 푸른 모습을 잃지 않아 오래 사는 것과 굳센 마음을 상징하기도 해요." },
+          { emoji: "🌸", label: "꽃", x: 22, y: 31, meaning: "꽃은 아름다움과 기쁜 일을 나타내곤 해요. 그림을 화사하게 꾸며 주기도 해요." }
+        ],
+        answer: "나쁜 기운을 막고 반가운 소식을 기다리는 마음",
+        choices: ["나쁜 기운을 막고 반가운 소식을 기다리는 마음", "책을 모두 불태우고 싶은 마음", "바닷속 물고기와 살고 싶은 마음"]
+      },
+      {
+        title: "십장생도",
+        subtitle: "오래 살기를 바라는 열 가지 상징",
+        genre: "십장생도",
+        fact: "십장생도에는 해, 산, 물, 돌, 소나무, 구름, 학, 사슴, 거북, 불로초 등 오래 사는 것과 관련된 상징이 등장해요. 그림마다 구성은 조금씩 다를 수 있어요.",
+        background: "linear-gradient(145deg, #b9d8d1, #e9e9c5 56%, #8eaf91)",
+        objects: [
+          { emoji: "☀️", label: "해", x: 74, y: 25, meaning: "해는 밝음과 생명력을 나타내요. 오래도록 세상을 비추는 모습으로 장수의 상징이 되기도 해요." },
+          { emoji: "🏔️", label: "산", x: 25, y: 65, meaning: "산은 오래도록 그 자리에 있는 굳센 자연을 나타내요. 오래 살기를 바라는 뜻으로 그려지기도 해요." },
+          { emoji: "🐢", label: "거북", x: 52, y: 73, meaning: "거북은 오래 사는 동물로 알려져 장수를 상징해요." },
+          { emoji: "🦌", label: "사슴", x: 69, y: 60, meaning: "사슴은 장수와 복을 상징하기도 해요. 그림에 따라 좋은 기운을 전하는 존재로 그려져요." },
+          { emoji: "🌲", label: "소나무", x: 28, y: 32, meaning: "소나무는 사계절 내내 푸르러 변치 않는 생명력과 장수를 상징해요." }
+        ],
+        answer: "오래오래 건강하게 살기를 바라는 마음",
+        choices: ["오래오래 건강하게 살기를 바라는 마음", "빨리 겨울이 오기를 바라는 마음", "집을 떠나 길을 잃고 싶은 마음"]
+      },
+      {
+        title: "화조도",
+        subtitle: "꽃과 새를 함께 그린 그림",
+        genre: "화조도",
+        fact: "화조도는 꽃과 새를 그린 민화예요. 꽃의 아름다움과 새의 생동감이 어우러져 화목하고 기쁜 삶을 바라는 뜻을 담기도 했어요.",
+        background: "linear-gradient(145deg, #f0d7b6, #f8edda 55%, #d7b7a0)",
+        objects: [
+          { emoji: "🌺", label: "꽃", x: 30, y: 49, meaning: "꽃은 아름다움과 생명력을 나타내요. 모란처럼 풍성한 꽃은 부귀와 복을 상징하기도 해요." },
+          { emoji: "🐦", label: "새", x: 65, y: 35, meaning: "새는 좋은 소식이나 기쁜 일을 나타내기도 해요. 짝을 지은 새는 화목한 사이를 뜻할 수 있어요." },
+          { emoji: "🦋", label: "나비", x: 72, y: 65, meaning: "나비는 아름다움과 즐거움을 나타내요. 꽃과 함께 그려져 생기 있는 봄 풍경을 만들어요." },
+          { emoji: "🌿", label: "풀과 잎", x: 40, y: 73, meaning: "푸른 잎은 자라나는 생명과 싱그러운 기운을 나타내요." }
+        ],
+        answer: "아름다운 자연 속에서 기쁘고 화목하게 살기를 바라는 마음",
+        choices: ["아름다운 자연 속에서 기쁘고 화목하게 살기를 바라는 마음", "모든 꽃과 새가 사라지기를 바라는 마음", "시험을 보지 않고 도망가고 싶은 마음"]
+      }
+    ];
+
+    const pointDisplay = document.getElementById("points");
+    let points = Number(localStorage.getItem("minhwaPoints") || 0);
+    let currentArt = 0;
+    let answered = new Set();
+
+    function updatePoints() {
+      pointDisplay.textContent = points;
+      localStorage.setItem("minhwaPoints", String(points));
+    }
+
+    function showArtwork(index) {
+      currentArt = (index + artworks.length) % artworks.length;
+      const art = artworks[currentArt];
+      const board = document.getElementById("artwork");
+      board.querySelectorAll(".item").forEach(item => item.remove());
+      board.style.background = art.background;
+      document.getElementById("artTitle").textContent = art.title;
+      document.getElementById("artSubtitle").textContent = art.subtitle;
+      document.getElementById("artGenre").textContent = art.genre;
+      document.getElementById("artFact").textContent = art.fact;
+      document.getElementById("artCount").textContent = `${currentArt + 1} / ${artworks.length}`;
+      document.getElementById("meaningBox").textContent = "사물을 눌러 어떤 소망이 담겼는지 알아보세요.";
+      document.getElementById("quizResult").textContent = "";
+      art.objects.forEach(obj => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "item";
+        item.style.left = obj.x + "%";
+        item.style.top = obj.y + "%";
+        item.textContent = obj.emoji;
+        item.setAttribute("aria-label", `${obj.label}의 뜻 보기`);
+        item.dataset.label = obj.label;
+        item.addEventListener("click", () => {
+          document.getElementById("meaningBox").innerHTML =
+            `<strong>${obj.label}의 뜻</strong><br>${obj.meaning}`;
+        });
+        board.appendChild(item);
+      });
+
+      const options = document.getElementById("quizOptions");
+      options.innerHTML = "";
+      art.choices.forEach(choice => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "quiz-option";
+        button.textContent = choice;
+        button.addEventListener("click", () => checkAnswer(button, choice, art.answer));
+        options.appendChild(button);
+      });
+
+      if (answered.has(currentArt)) {
+        document.getElementById("quizResult").textContent = "이 그림의 퀴즈는 이미 풀었어요. 다음 그림도 도전해 보세요!";
+        options.querySelectorAll("button").forEach(button => {
+          button.disabled = true;
+          if (button.textContent === art.answer) button.classList.add("correct");
+        });
+      }
+    }
+
+    function checkAnswer(button, choice, answer) {
+      const result = document.getElementById("quizResult");
+      const buttons = [...document.querySelectorAll(".quiz-option")];
+      if (choice === answer) {
+        button.classList.add("correct");
+        if (!answered.has(currentArt)) {
+          points += 10;
+          updatePoints();
+          answered.add(currentArt);
+          result.textContent = "정답이에요! ⭐ 10점을 얻었어요!";
+        } else {
+          result.textContent = "정답이에요! 이 그림의 점수는 이미 받았어요.";
+        }
+        buttons.forEach(option => option.disabled = true);
+      } else {
+        button.classList.add("wrong");
+        result.textContent = "아쉬워요! 사물의 뜻을 다시 살펴보고 생각해 보세요.";
+      }
+    }
+
+    document.getElementById("prevArt").addEventListener("click", () => showArtwork(currentArt - 1));
+    document.getElementById("nextArt").addEventListener("click", () => showArtwork(currentArt + 1));
+
+    const studyTab = document.getElementById("studyTab");
+    const createTab = document.getElementById("createTab");
+    studyTab.addEventListener("click", () => {
+      studyTab.classList.add("active");
+      createTab.classList.remove("active");
+      document.getElementById("studyPanel").classList.remove("hidden");
+      document.getElementById("creatorPanel").classList.add("hidden");
+    });
+    createTab.addEventListener("click", () => {
+      createTab.classList.add("active");
+      studyTab.classList.remove("active");
+      document.getElementById("creatorPanel").classList.remove("hidden");
+      document.getElementById("studyPanel").classList.add("hidden");
+    });
+
+    const symbolLibrary = [
+      { emoji: "🌸", label: "꽃", keys: ["행복", "아름", "기쁨", "봄", "친구", "가족"] },
+      { emoji: "📚", label: "책", keys: ["공부", "지혜", "시험", "배움", "꿈", "선생"] },
+      { emoji: "🐢", label: "거북", keys: ["건강", "오래", "장수", "튼튼"] },
+      { emoji: "🐦", label: "새", keys: ["소식", "친구", "여행", "자유", "행복"] },
+      { emoji: "🐯", label: "호랑이", keys: ["용기", "무서", "보호", "안전"] },
+      { emoji: "🍑", label: "복숭아", keys: ["건강", "오래", "장수"] },
+      { emoji: "🌲", label: "소나무", keys: ["건강", "오래", "장수", "굳센"] },
+      { emoji: "🦋", label: "나비", keys: ["행복", "아름", "기쁨", "봄"] },
+      { emoji: "💰", label: "복주머니", keys: ["돈", "부자", "풍요", "복", "넉넉"] },
+      { emoji: "🏺", label: "도자기", keys: ["풍요", "넉넉", "부자"] },
+      { emoji: "☀️", label: "해", keys: ["밝", "희망", "건강", "새로운"] },
+      { emoji: "🌙", label: "달", keys: ["평화", "밤", "소원"] },
+      { emoji: "🌈", label: "무지개", keys: ["행복", "희망", "기쁨"] },
+      { emoji: "🐟", label: "물고기", keys: ["풍요", "복", "넉넉"] },
+      { emoji: "🖌️", label: "붓", keys: ["공부", "지혜", "배움", "꿈"] }
+    ];
+
+    const board = document.getElementById("creatorBoard");
+    const objectOptions = document.getElementById("objectOptions");
+    const wishStatus = document.getElementById("wishStatus");
+    let itemCounter = 0;
+
+    function addCreatorItem(symbol, x, y) {
+      const item = document.createElement("div");
+      item.className = "item";
+      item.textContent = symbol.emoji;
+      item.title = symbol.label + " — 끌어서 옮기기";
+      item.setAttribute("aria-label", symbol.label + ", 끌어서 옮기기");
+      item.style.left = (x ?? 50) + "%";
+      item.style.top = (y ?? 50) + "%";
+      item.dataset.id = String(++itemCounter);
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "remove";
+      remove.textContent = "×";
+      remove.setAttribute("aria-label", symbol.label + " 지우기");
+      remove.addEventListener("pointerdown", event => event.stopPropagation());
+      remove.addEventListener("click", event => {
+        event.stopPropagation();
+        item.remove();
+      });
+      item.appendChild(remove);
+
+      item.addEventListener("pointerdown", event => {
+        if (event.target === remove) return;
+        event.preventDefault();
+        item.classList.add("selected");
+        item.setPointerCapture(event.pointerId);
+        const rect = board.getBoundingClientRect();
+        const move = moveEvent => {
+          const left = Math.max(4, Math.min(96, ((moveEvent.clientX - rect.left) / rect.width) * 100));
+          const top = Math.max(6, Math.min(94, ((moveEvent.clientY - rect.top) / rect.height) * 100));
+          item.style.left = left + "%";
+          item.style.top = top + "%";
+        };
+        const end = () => {
+          item.classList.remove("selected");
+          item.removeEventListener("pointermove", move);
+          item.removeEventListener("pointerup", end);
+          item.removeEventListener("pointercancel", end);
+        };
+        item.addEventListener("pointermove", move);
+        item.addEventListener("pointerup", end);
+        item.addEventListener("pointercancel", end);
+      });
+
+      board.appendChild(item);
+    }
+
+    symbolLibrary.forEach(symbol => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "object-button";
+      button.innerHTML = `${symbol.emoji}<span>${symbol.label}</span>`;
+      button.setAttribute("aria-label", `${symbol.label} 그림에 추가`);
+      button.addEventListener("click", () => {
+        addCreatorItem(symbol, 50, 50);
+        wishStatus.textContent = `${symbol.label}을(를) 그림에 추가했어요. 원하는 곳으로 옮겨 보세요!`;
+      });
+      objectOptions.appendChild(button);
+    });
+
+    document.getElementById("wishButton").addEventListener("click", () => {
+      const wish = document.getElementById("wishInput").value.trim();
+      if (!wish) {
+        wishStatus.textContent = "먼저 이루고 싶은 소망을 적어 주세요.";
+        return;
+      }
+      const matched = symbolLibrary.filter(symbol => symbol.keys.some(key => wish.includes(key)));
+      const suggestions = matched.length ? matched.slice(0, 4) : [symbolLibrary[0], symbolLibrary[10], symbolLibrary[8]];
+      suggestions.forEach((symbol, index) => addCreatorItem(symbol, 32 + index * 12, 48 + (index % 2) * 13));
+      const names = suggestions.map(symbol => symbol.label).join(", ");
+      wishStatus.textContent = `“${wish}”에 어울리는 사물을 골라 봤어요: ${names}. 더하고 싶은 사물은 아래에서 선택하세요!`;
+    });
+
+    const colors = [
+      { name: "따뜻한 한지", color: "linear-gradient(145deg, #e8d1a2, #f8edcf 55%, #c3a576)" },
+      { name: "맑은 하늘", color: "linear-gradient(145deg, #b9d8e6, #edf5e6 55%, #9ab7a2)" },
+      { name: "분홍 꽃밭", color: "linear-gradient(145deg, #f0c9cc, #fff0dc 55%, #d8b1a3)" },
+      { name: "초록 숲", color: "linear-gradient(145deg, #bed0a8, #e8e4bf 55%, #8eaf91)" },
+      { name: "저녁 노을", color: "linear-gradient(145deg, #e8aa7b, #f5d6a5 55%, #b97d74)" },
+      { name: "고요한 밤", color: "linear-gradient(145deg, #8998bd, #d0c8d8 55%, #717e9d)" }
+    ];
+    const colorOptions = document.getElementById("colorOptions");
+    colors.forEach((option, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "swatch";
+      button.style.background = option.color;
+      button.title = option.name;
+      button.setAttribute("aria-label", option.name + " 배경");
+      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+      button.addEventListener("click", () => {
+        board.style.background = option.color;
+        colorOptions.querySelectorAll("button").forEach(item => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+      });
+      colorOptions.appendChild(button);
+    });
+
+    const moods = [
+      { name: "☀️ 밝고 씩씩하게", filter: "saturate(1.12) brightness(1.03)" },
+      { name: "🌙 차분하고 고요하게", filter: "saturate(.75) brightness(.94)" },
+      { name: "✨ 반짝반짝 신나게", filter: "saturate(1.3) contrast(1.04)" }
+    ];
+    const moodOptions = document.getElementById("moodOptions");
+    moods.forEach((mood, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mood-button";
+      button.textContent = mood.name;
+      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+      button.addEventListener("click", () => {
+        board.style.filter = mood.filter;
+        moodOptions.querySelectorAll("button").forEach(item => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+      });
+      moodOptions.appendChild(button);
+    });
+
+    document.getElementById("clearBoard").addEventListener("click", () => {
+      board.querySelectorAll(".item").forEach(item => item.remove());
+      wishStatus.textContent = "그림판을 깨끗하게 비웠어요. 새로 만들어 볼까요?";
+    });
+
+    document.getElementById("saveImage").addEventListener("click", () => {
+      const rect = board.getBoundingClientRect();
+      const background = getComputedStyle(board).backgroundColor;
+      const items = [...board.querySelectorAll(".item")].map(item => {
+        const x = parseFloat(item.style.left);
+        const y = parseFloat(item.style.top);
+        const emoji = item.firstChild.textContent;
+        return `<text x="${x}%" y="${y}%" text-anchor="middle" dominant-baseline="middle" font-size="54">${emoji}</text>`;
+      }).join("");
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(rect.width)}" height="${Math.round(rect.height)}" viewBox="0 0 ${Math.round(rect.width)} ${Math.round(rect.height)}"><rect width="100%" height="100%" fill="${background}"/><rect x="12" y="12" width="calc(100% - 24px)" height="calc(100% - 24px)" rx="12" fill="none" stroke="#fff9e9" stroke-width="2"/>${items}</svg>`;
+      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "나만의-민화.svg";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      wishStatus.textContent = "작품을 이미지 파일로 저장했어요!";
+    });
+
+    updatePoints();
+    showArtwork(0);
+  </script>
+</body>
+</html>
